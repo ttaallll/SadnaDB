@@ -7,8 +7,12 @@ siteFormats = [
 
 def addBookToDB(bookText, siteFormat):
 
+    bookData = {}
+
     if siteFormat == 'gutenberg':
-        parseGutenberg(bookText)
+        bookData = parseGutenberg(bookText)
+
+    addNewBook(bookData)
 
 
 
@@ -38,7 +42,22 @@ def parseGutenberg(text):
             break
 
     bookLines = lines[currentLine:endBookLine]
-    print metadata1
-    print startBookLine
-    print endBookLine
-    print len(lines)
+
+    return {
+        'metadata': metadata1,
+        'bookLines': bookLines
+    }
+
+
+
+def addNewBook(bookData):
+
+    metadata = bookData['metadata']
+    bookLines = bookData['bookLines']
+
+    bookId = insertBook(metadata)
+
+    addAllWords(bookId, bookLines)
+
+    
+def insertBook(metadata):

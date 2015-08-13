@@ -5,7 +5,7 @@ CREATE TABLE languages (
 );
 
 CREATE TABLE books (
-	id int,
+	id int NOT NULL AUTO_INCREMENT,
 	title varchar(255),
 	author varchar(255),
 	releaseDate DATE,
@@ -48,4 +48,19 @@ CREATE TABLE wordsInGroupWords (
 	FOREIGN KEY (wordId) REFERENCES words(id),
 	FOREIGN KEY (groupWordId) REFERENCES groupWords(id),
 	PRIMARY KEY (wordId, groupWordId)
+);
+
+CREATE TABLE phrases (
+	id int,
+	dateCreated DATE,
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE wordsInphrases (
+	wordId int,
+	phraseId int,
+	orderNumber int,
+	FOREIGN KEY (wordId) REFERENCES words(id),
+	FOREIGN KEY (phraseId) REFERENCES phrases(id),
+	PRIMARY KEY (wordId, phraseId)
 );
