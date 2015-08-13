@@ -19,6 +19,7 @@ def parseGutenberg(text):
     currentLine = -1
     startBookLine = 0
     endBookLine = 0
+
     for tempLine in lines:
         currentLine += 1
         if tempLine.startswith('Title:'):
@@ -26,7 +27,7 @@ def parseGutenberg(text):
         if tempLine.startswith('Author:'):
             metadata1['author'] = tempLine[tempLine.find(':') + 2:]
         if tempLine.startswith('Release Date:'):
-            metadata1['releaseData'] = tempLine[tempLine.find(':') + 2:]
+            metadata1['releaseDate'] = tempLine[tempLine.find(':') + 2:]
         if tempLine.startswith('Language:'):
             metadata1['language'] = tempLine[tempLine.find(':') + 2:]
         if tempLine.startswith('*** START'):
