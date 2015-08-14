@@ -1,5 +1,5 @@
 CREATE TABLE languages (
-	id int,
+	id int NOT NULL AUTO_INCREMENT,
 	name varchar(255),
 	PRIMARY KEY (id)
 );
@@ -16,7 +16,7 @@ CREATE TABLE books (
 );	
 
 CREATE TABLE words (
-	id int,
+	id int NOT NULL AUTO_INCREMENT,
 	word varchar(255),
 	
 	PRIMARY KEY (id)
@@ -36,7 +36,7 @@ CREATE TABLE wordsInBooks (
 );
 
 CREATE TABLE groupWords (
-	id int,
+	id int NOT NULL AUTO_INCREMENT,
 	name varchar(255),
 	dateCreated DATE,
 	PRIMARY KEY (id)
@@ -51,7 +51,7 @@ CREATE TABLE wordsInGroupWords (
 );
 
 CREATE TABLE phrases (
-	id int,
+	id int NOT NULL AUTO_INCREMENT,
 	dateCreated DATE,
 	PRIMARY KEY (id)
 );

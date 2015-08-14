@@ -28,19 +28,20 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
 
+
 def tryConnectToDb():
     env = os.getenv('SERVER_SOFTWARE')
-    if (env and env.startswith('Google App Engine/')):
-      # Connecting from App Engine
-      db = MySQLdb.connect(
-        unix_socket='/cloudsql/sadnadb:db1',
-        user='root')
+    if env and env.startswith('Google App Engine/'):
+        # Connecting from App Engine
+        db = MySQLdb.connect(
+            unix_socket='/cloudsql/sadnadb:db1',
+            user='root')
     else:
-      # You may also assign an IP Address from the access control
-      # page and use it to connect from an external network.
+        # You may also assign an IP Address from the access control
+        # page and use it to connect from an external network.
 
-      db = MySQLdb.connect(host=DB_IP, user='root')
-      pass
+        db = MySQLdb.connect(host=DB_IP, user='root')
+        pass
 
     str1 = ''
 
@@ -56,12 +57,50 @@ def tryConnectToDb():
     return str1
 
 
+def createDbConnection():
+    env = os.getenv('SERVER_SOFTWARE')
+    if env and env.startswith('Google App Engine/'):
+        # Connecting from App Engine
+        db = MySQLdb.connect(
+            unix_socket='/cloudsql/sadnadb:db1',
+            user='root')
+    else:
+        # You may also assign an IP Address from the access control
+        # page and use it to connect from an external network.
+
+        db = MySQLdb.connect(host=DB_IP, user='root')
+
+    return db
+
+
+def createRequestContext():
+    db1 = createDbConnection()
+
+    return {
+        "db": db1
+    }
+
+
+def clearRequestContext(requestContext):
+
+    # close db connection
+    requestContext["db"].close()
+
+
 class UploadFileHandler(webapp2.RequestHandler):
     def post(self):
 
         file1 = self.request.get('file')
 
-        addBookToDB(file1, 'gutenberg')
+        requestContext = createRequestContext()
+
+        try:
+            addBookToDB(requestContext, file1, 'gutenberg')
+            requestContext["db"].commit()
+        except Exception as e:
+            requestContext["db"].rollback()
+
+        clearRequestContext(requestContext)
 
         self.response.write('123')
 
@@ -69,8 +108,13 @@ class UploadFileHandler(webapp2.RequestHandler):
 class MainHandler(webapp2.RequestHandler):
     def get(self):
 
+        requestContext = createRequestContext()
+        lastBook = getLastBookFromDB(requestContext)
+        clearRequestContext(requestContext)
+
         template_values = {
-            'user': 1
+            'user': 1,
+            'lastBook': lastBook
         }
 
         template = JINJA_ENVIRONMENT.get_template('index.html')
