@@ -52,13 +52,11 @@ def addWords(rc, words, bookId):
 
     wordsExists, wordsNotExists = checkIfWordsExists(rc, words)
 
-    # insert to db the not existed
+    # insert to table words the not existed
     cursor = rc["db"].cursor()
     query = 'INSERT INTO sadnadb.words (word) VALUES (%s)'
     cursor.executemany(query, wordsNotExists)
     rc["db"].commit()
-
-
 
     print 'inserted - ' + str(wordsNotExists)
 

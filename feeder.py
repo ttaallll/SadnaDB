@@ -28,15 +28,20 @@ def addBookToDB(rc, bookUrl, siteFormat):
 
     bookText = geFromStorage(bookUrl)
 
-    bookData = {}
+    bookData = {
+        'bookUrl': bookUrl,
+        'bookText': bookText
+    }
 
     if siteFormat == 'gutenberg':
-        bookData = parseGutenberg(bookText)
+        parseGutenberg(bookData)
 
     addNewBook(rc, bookData)
 
 
-def parseGutenberg(text):
+def parseGutenberg(bookData):
+
+    text = bookData['bookText']
     lines = text.split('\r\n')
 
     metadata1 = {
@@ -68,18 +73,17 @@ def parseGutenberg(text):
 
     bookLines = lines[startBookLine + 1:endBookLine]
 
-    return {
-        'metadata': metadata1,
-        'bookLines': bookLines
-    }
+    bookData['metadata'] = metadata1
+    bookData['bookLines'] = bookLines
 
 
 def addNewBook(rc, bookData):
 
     metadata = bookData['metadata']
     bookLines = bookData['bookLines']
+    bookUrl = bookData['bookUrl']
 
-    bookId = insertBook(rc, metadata)
+    bookId = insertBook(rc, metadata, bookUrl)
 
     addAllWords(rc, bookLines, bookId)
 
@@ -114,7 +118,7 @@ def getLanguageId(rc, languageName):
     return languageId
 
 
-def insertBook(rc, metadata):
+def insertBook(rc, metadata, bookUrl):
 
     cursor = rc["db"].cursor()
     cursor.execute('INSERT INTO {0} ({1}, {2}, {3}, {4}, {5}) VALUES (\'{6}\', \'{7}\', \'{8}\', \'{9}\', \'{10}\')'.format(
@@ -129,7 +133,7 @@ def insertBook(rc, metadata):
         metadata['author'],
         metadata['releaseDate'],
         getLanguageId(rc, metadata['language']),
-        'tempPath'
+        bookUrl
     ))
 
     result = cursor.fetchall()
