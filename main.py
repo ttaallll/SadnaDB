@@ -16,12 +16,14 @@
 #
 import webapp2
 import os
+from google.appengine.api import taskqueue
 
 import jinja2
 import MySQLdb
 
 from myconfig import *
 from feeder import *
+from storage import *
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__) + '/templates'),
@@ -91,18 +93,30 @@ class UploadFileHandler(webapp2.RequestHandler):
     def post(self):
 
         file1 = self.request.get('file')
+        filename1 = self.request.POST['file'].filename
+
+        # upload to cloud
+        bookUrl = uploadToStorage(filename1, file1)
+
+        taskqueue.add(url='/addBookTask', params={'bookUrl': bookUrl})
+
+        self.response.write(bookUrl)
+
+
+class AddBookTaskHandler(webapp2.RequestHandler):
+    def post(self):
+        bookUrl = self.request.get('bookUrl')
 
         requestContext = createRequestContext()
 
         try:
-            addBookToDB(requestContext, file1, 'gutenberg')
+            addBookToDB(requestContext, bookUrl, 'gutenberg')
             requestContext["db"].commit()
         except Exception as e:
+            print e
             requestContext["db"].rollback()
 
         clearRequestContext(requestContext)
-
-        self.response.write('123')
 
 
 class MainHandler(webapp2.RequestHandler):
@@ -122,5 +136,6 @@ class MainHandler(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
-    ('/upload', UploadFileHandler)
+    ('/upload', UploadFileHandler),
+    ('/addBookTask', AddBookTaskHandler),
 ], debug=True)

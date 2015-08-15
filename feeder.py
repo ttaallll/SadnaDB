@@ -3,6 +3,7 @@ __author__ = 'pais'
 from datetime import datetime
 
 from words import addAllWords
+from storage import geFromStorage
 
 siteFormats = [
     'gutenberg',
@@ -23,7 +24,9 @@ def getLastBookFromDB(rc):
     return bookData
 
 
-def addBookToDB(rc, bookText, siteFormat):
+def addBookToDB(rc, bookUrl, siteFormat):
+
+    bookText = geFromStorage(bookUrl)
 
     bookData = {}
 
