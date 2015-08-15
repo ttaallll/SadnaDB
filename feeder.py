@@ -52,7 +52,9 @@ def parseGutenberg(bookData):
     }
     currentLine = -1
     startBookLine = 0
+    startBookChar = 0
     endBookLine = 0
+    currentChar = 0
 
     for tempLine in lines:
         currentLine += 1
@@ -67,14 +69,18 @@ def parseGutenberg(bookData):
         if tempLine.startswith('*** START'):
             # we start from here to read the book
             startBookLine = currentLine
+            startBookChar = currentChar
         if tempLine.startswith('*** END OF '):
             endBookLine = currentLine
             break
+
+        currentChar += len(tempLine) + 2
 
     bookLines = lines[startBookLine + 1:endBookLine]
 
     bookData['metadata'] = metadata1
     bookData['bookLines'] = bookLines
+    bookData['startBookChar'] = startBookChar
 
 
 def addNewBook(rc, bookData):
@@ -82,10 +88,11 @@ def addNewBook(rc, bookData):
     metadata = bookData['metadata']
     bookLines = bookData['bookLines']
     bookUrl = bookData['bookUrl']
+    startBookChar = bookData['startBookChar']
 
     bookId = insertBook(rc, metadata, bookUrl)
 
-    addAllWords(rc, bookLines, bookId)
+    addAllWords(rc, bookLines, bookId, startBookChar)
 
 
 

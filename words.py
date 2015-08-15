@@ -4,21 +4,34 @@ __author__ = 'tal'
 LINES_OF_BULK_WORDS = 3
 
 
-def addAllWords(rc, bookLines, bookId):
+def addAllWords(rc, bookLines, bookId, startBookChar):
 
-    currentLine = 0
+    currentChar = 0
+    currentLine = 1
+    currentParagraph = 1
     currentWords = []
     for tempLine in bookLines:
-        currentLine += 1
+
         currentWords += tempLine.split(' ')
 
         if currentLine % LINES_OF_BULK_WORDS == 0:
-            currentWords = fixWords(currentWords)
 
-            addWords(rc, currentWords, bookId)
+            currentWords = fixWords(currentWords)
+            addWords(rc, currentWords)
             currentWords = []
 
+        addWordsInBooks(currentWords, currentLine, currentParagraph, bookId, startBookChar, startLineChar)
+
         print currentLine
+
+        currentChar += len(tempLine) + 2
+        currentLine += 1
+        if tempLine == '':
+            currentParagraph += 1
+
+
+def addWordsInBooks(words, lineNumber, paragraphNumber, bookId, startBookChar, startLineChar):
+
 
 
 def fixWords(words):
@@ -43,7 +56,7 @@ def fixWords(words):
     return lowerWords
 
 
-def addWords(rc, words, bookId):
+def addWords(rc, words):
 
     if len(words) == 0:
         return
