@@ -32,7 +32,7 @@ CREATE TABLE wordsInBooks (
 	paragraphNumber int,
 	FOREIGN KEY (wordId) REFERENCES words(id),
 	FOREIGN KEY (bookId) REFERENCES books(id),
-	PRIMARY KEY (wordId, bookId)
+	PRIMARY KEY (wordId, bookId, wordNumber)
 );
 
 CREATE TABLE groupWords (

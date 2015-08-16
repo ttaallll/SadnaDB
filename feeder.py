@@ -143,6 +143,14 @@ def insertBook(rc, metadata, bookUrl):
         bookUrl
     ))
 
+    rc["db"].commit()
+
+    selectQuery = 'SELECT id FROM sadnadb.books WHERE fileLocation = %s'
+    cursor.execute(selectQuery, bookUrl)
     result = cursor.fetchall()
 
-    return result
+    bookId = 0
+    if len(result) > 0:
+        bookId = result[0][0]
+
+    return bookId
