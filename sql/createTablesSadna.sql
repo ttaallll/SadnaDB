@@ -8,7 +8,7 @@ CREATE TABLE books (
 	id int NOT NULL AUTO_INCREMENT,
 	title varchar(255),
 	author varchar(255),
-	releaseDate DATE,
+	releaseDate varchar(255),
 	language int,
 	fileLocation varchar(255),
 	FOREIGN KEY (language) REFERENCES languages(id),

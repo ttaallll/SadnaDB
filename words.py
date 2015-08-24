@@ -1,5 +1,6 @@
 __author__ = 'tal'
 
+import re
 
 LINES_OF_BULK_WORDS = 3
 chars_to_remove = ['.', '!', '?', ',',
@@ -25,19 +26,20 @@ def addAllWords(rc, bookLines, bookId, startBookChar):
 
     # add words
     for tempLine in bookLines:
-        currentWords += tempLine.split(' ')
+        # currentWords += tempLine.split(' ')
+        currentWords += re.split('-| ', tempLine)
 
         if len(currentWords) == 1 and currentWords[0] == '':
             currentWords = []
 
         if currentLine % LINES_OF_BULK_WORDS == 0:
+            print currentLine
+
             currentWords = fixWords(currentWords)
             addWords(rc, currentWords)
             currentWords = []
 
         currentLine += 1
-
-        print currentLine
 
     if len(currentWords) != 0:
         currentWords = fixWords(currentWords)
@@ -51,21 +53,20 @@ def addAllWords(rc, bookLines, bookId, startBookChar):
 
     for tempLine in bookLines:
 
-        currentWords += tempLine.split(' ')
-        currentWordsThisLine = tempLine.split(' ')
+        # currentWordsThisLine = tempLine.split(' ')
+        currentWordsThisLine = re.split('-| ', tempLine)
 
         if len(currentWordsThisLine) == 1 and currentWordsThisLine[0] == '':
             currentWordsThisLine = []
 
         if currentLine % LINES_OF_BULK_WORDS == 0:
+            print currentLine
             insertWordsInBooks(rc, wordsInBooksToInsert)
             wordsInBooksToInsert = []
 
         tempWordsInBooksToInsert, realWordsCount = createQueryValuesWordsInBooks(rc, currentWordsThisLine, currentLine, currentParagraph, bookId, currentChar, currentWordsCount)
 
         wordsInBooksToInsert += tempWordsInBooksToInsert
-
-        print currentLine
 
         currentWordsCount += realWordsCount
         currentChar += len(tempLine) + 2
