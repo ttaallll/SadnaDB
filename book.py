@@ -54,7 +54,7 @@ def getBookForTemplate(rc, bookId):
 
     words = []
     for tempWord in book['words']:
-        words += [{'text': tempWord['text'],
+        words += [{'text': tempWord['text'].decode('utf-8'),
                    'href': '/word?id=' + str(tempWord['id']),
                    'count': tempWord['count']
                    }]

@@ -2,33 +2,67 @@ __author__ = 'tal'
 
 
 LINES_OF_BULK_WORDS = 3
+chars_to_remove = ['.', '!', '?', ',',
+                   ':', ';', '"', '\'',
+                   '\\', '_', '[', ']',
+                   '(', ')', '{', '}',
+                   '/', '*', '&', '^',
+                   '%', '$', '#', '@']
 
 
 def addAllWords(rc, bookLines, bookId, startBookChar):
+
+    print 'num of lines - ' + str(len(bookLines))
 
     currentChar = 0 + startBookChar
     currentLine = 1
     currentParagraph = 1
     currentWords = []
     currentWordsCount = 1
+
+    wordsInBooksToInsert = []
+
+    # add words
+    for tempLine in bookLines:
+        currentWords += tempLine.split(' ')
+
+        if len(currentWords) == 1 and currentWords[0] == '':
+            currentWords = []
+
+        if currentLine % LINES_OF_BULK_WORDS == 0:
+            currentWords = fixWords(currentWords)
+            addWords(rc, currentWords)
+            currentWords = []
+
+        currentLine += 1
+
+        print currentLine
+
+    if len(currentWords) != 0:
+        currentWords = fixWords(currentWords)
+        addWords(rc, currentWords)
+        currentWords = []
+
+    #####
+    # add words in books
+
+    currentLine = 1
+
     for tempLine in bookLines:
 
         currentWords += tempLine.split(' ')
         currentWordsThisLine = tempLine.split(' ')
 
-        if len(currentWords) == 1 and currentWords[0] == '':
-            currentWords = []
-
         if len(currentWordsThisLine) == 1 and currentWordsThisLine[0] == '':
             currentWordsThisLine = []
 
         if currentLine % LINES_OF_BULK_WORDS == 0:
+            insertWordsInBooks(rc, wordsInBooksToInsert)
+            wordsInBooksToInsert = []
 
-            currentWords = fixWords(currentWords)
-            addWords(rc, currentWords)
-            currentWords = []
+        tempWordsInBooksToInsert, realWordsCount = createQueryValuesWordsInBooks(rc, currentWordsThisLine, currentLine, currentParagraph, bookId, currentChar, currentWordsCount)
 
-        realWordsCount = addWordsInBooks(rc, currentWordsThisLine, currentLine, currentParagraph, bookId, currentChar, currentWordsCount)
+        wordsInBooksToInsert += tempWordsInBooksToInsert
 
         print currentLine
 
@@ -38,17 +72,27 @@ def addAllWords(rc, bookLines, bookId, startBookChar):
         if tempLine == '':
             currentParagraph += 1
 
+    if len(wordsInBooksToInsert) != 0:
+        insertWordsInBooks(rc, wordsInBooksToInsert)
+        wordsInBooksToInsert = []
 
-def addWordsInBooks(rc, words, lineNumber, paragraphNumber, bookId, startLineChar, startLineWordsCount):
+
+def createQueryValuesWordsInBooks(rc, words, lineNumber, paragraphNumber, bookId, startLineChar, startLineWordsCount):
 
     realWordsCount = 0
     currentWordCount = startLineWordsCount
     currentChar = startLineChar
 
-    for tempWord in words:
-        newTempWord = tempWord.replace("'", "\\'")
+    wordsToInsert = []
 
-        chars_to_remove = ['.', '!', '?', ',', ':', ';']
+    fixedWords = fixWords(words)
+
+    exists, notExists = checkIfWordsExists(rc, fixedWords)
+
+    for tempWord in words:
+        # newTempWord = tempWord.replace("'", "\\'")
+        newTempWord = tempWord
+
         newTempWord = newTempWord.translate(None, ''.join(chars_to_remove))
         newTempWord = newTempWord.lower()
 
@@ -56,34 +100,31 @@ def addWordsInBooks(rc, words, lineNumber, paragraphNumber, bookId, startLineCha
             currentChar += 1
             continue
 
-        cursor = rc["db"].cursor()
-        query = 'SELECT id FROM sadnadb.words WHERE word = %s'
-        cursor.execute(query, newTempWord)
-        result = cursor.fetchall()
+        # wordsToInsert += [{
+        #     'wordId': exists[newTempWord],
+        #     'bookId': bookId,
+        #     'lineNumber': lineNumber,
+        #     'wordNumber': currentWordCount,
+        #     'characterLocation': currentChar,
+        #     'sentenceNumber': 0,
+        #     'paragraphNumber': paragraphNumber
+        # }]
 
-        wordId = 0
-        if len(result) > 0:
-            wordId = result[0][0]
-
-
-        cursor = rc["db"].cursor()
-        query = 'INSERT INTO sadnadb.wordsInBooks (' \
-                ' wordId,' \
-                ' bookId,' \
-                ' lineNumber,' \
-                ' wordNumber,' \
-                ' characterLocation,' \
-                ' sentenceNumber,' \
-                ' paragraphNumber)' \
-                ' VALUES (%s, %s, %s, %s, %s, %s, %s)' % (wordId, bookId, lineNumber, currentWordCount, currentChar, 0, paragraphNumber)
-        cursor.execute(query)
-        rc["db"].commit()
+        wordsToInsert += [(
+            exists[newTempWord],
+            bookId,
+            lineNumber,
+            currentWordCount,
+            currentChar,
+            0,
+            paragraphNumber
+        )]
 
         realWordsCount += 1
         currentWordCount += 1
         currentChar += len(tempWord) + 1
 
-    return realWordsCount
+    return wordsToInsert, realWordsCount
 
 
 def fixWords(words):
@@ -95,9 +136,9 @@ def fixWords(words):
 
     lowerWords = []
     for tempWord in words:
-        newTempWord = tempWord.replace("'", "\\'")
+        # newTempWord = tempWord.replace("'", "\\'")
+        newTempWord = tempWord
 
-        chars_to_remove = ['.', '!', '?', ',', ':', ';']
         newTempWord = newTempWord.translate(None, ''.join(chars_to_remove))
 
         if len(newTempWord) == 0:
@@ -105,15 +146,18 @@ def fixWords(words):
 
         lowerWords += [newTempWord.lower()]
 
+    if '' in lowerWords:
+        lowerWords.remove('')
+
     return lowerWords
 
 
 def addWords(rc, words):
 
+    words = list(set(words))
+
     if len(words) == 0:
         return
-
-    words = list(set(words))
 
     wordsExists, wordsNotExists = checkIfWordsExists(rc, words)
 
@@ -126,10 +170,35 @@ def addWords(rc, words):
     print 'inserted - ' + str(wordsNotExists)
 
 
+def insertWordsInBooks(rc, wordsInBooks):
+
+    if len(wordsInBooks) == 0:
+        return
+
+    # insert to table words the not existed
+    cursor = rc["db"].cursor()
+    query = 'INSERT INTO sadnadb.wordsInBooks (' \
+            ' wordId,' \
+            ' bookId,' \
+            ' lineNumber,' \
+            ' wordNumber,' \
+            ' characterLocation,' \
+            ' sentenceNumber,' \
+            ' paragraphNumber)' \
+            ' VALUES (%s, %s, %s, %s, %s, %s, %s)'
+    cursor.executemany(query, wordsInBooks)
+    rc["db"].commit()
+
+    print 'insert words in books - ' + str(len(wordsInBooks)) + ' ' + str([x[0] for x in wordsInBooks])
+
+
 def checkIfWordsExists(rc, words):
 
     exists = {}
     notExists = []
+
+    if len(words) == 0:
+        return exists, notExists
 
     cursor = rc["db"].cursor()
     query = 'SELECT * FROM sadnadb.words WHERE word in ('
