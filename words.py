@@ -9,7 +9,7 @@ chars_to_remove = ['.', '!', '?', ',',
                    '(', ')', '{', '}',
                    '/', '*', '&', '^',
                    '%', '$', '#', '@',
-                   '-', '=', '+']
+                   '-', '=', '+', '~']
 
 
 def addAllWords(rc, bookLines, bookId, startBookChar):
@@ -177,21 +177,26 @@ def insertWordsInBooks(rc, wordsInBooks):
     if len(wordsInBooks) == 0:
         return
 
-    # insert to table words the not existed
-    cursor = rc["db"].cursor()
-    query = 'INSERT INTO sadnadb.wordsInBooks (' \
-            ' wordId,' \
-            ' bookId,' \
-            ' lineNumber,' \
-            ' wordNumber,' \
-            ' characterLocation,' \
-            ' sentenceNumber,' \
-            ' paragraphNumber)' \
-            ' VALUES (%s, %s, %s, %s, %s, %s, %s)'
-    cursor.executemany(query, wordsInBooks)
-    rc["db"].commit()
+    try:
+        # insert to table words the not existed
+        cursor = rc["db"].cursor()
+        query = 'INSERT INTO sadnadb.wordsInBooks (' \
+                ' wordId,' \
+                ' bookId,' \
+                ' lineNumber,' \
+                ' wordNumber,' \
+                ' characterLocation,' \
+                ' sentenceNumber,' \
+                ' paragraphNumber)' \
+                ' VALUES (%s, %s, %s, %s, %s, %s, %s)'
+        cursor.executemany(query, wordsInBooks)
+        rc["db"].commit()
 
-    print 'insert words in books - ' + str(len(wordsInBooks)) + ' ' + str([x[0] for x in wordsInBooks])
+        print 'insert words in books - ' + str(len(wordsInBooks)) + ' ' + str([x[0] for x in wordsInBooks])
+
+    except Exception as e:
+        print e
+        print 'probably duplicate'
 
 
 def checkIfWordsExists(rc, words):
