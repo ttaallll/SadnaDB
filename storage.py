@@ -20,7 +20,8 @@ def uploadToStorage(bookName, bookText):
     gcs_file = gcs.open(filename,
                         'w',
                         content_type='text/plain',
-                        retry_params=write_retry_params)
+                        retry_params=write_retry_params,
+                        options={'x-goog-acl': 'public-read'})
 
     gcs_file.write(bookText)
     gcs_file.close()

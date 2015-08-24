@@ -78,7 +78,10 @@ def parseGutenberg(bookData):
         if tempLine.startswith('Author:'):
             metadata1['author'] = tempLine[tempLine.find(':') + 2:]
         if tempLine.startswith('Release Date:'):
-            metadata1['releaseDate'] = datetime.strptime(tempLine[tempLine.find(':') + 2:].split('[')[0], '%b, %Y ')
+            try:
+                metadata1['releaseDate'] = datetime.strptime(tempLine[tempLine.find(':') + 2:].split('[')[0], '%b, %Y ')
+            except:
+                print 'couldn\'t parse release date'
         if tempLine.startswith('Language:'):
             metadata1['language'] = tempLine[tempLine.find(':') + 2:]
         if tempLine.startswith('*** START'):
