@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+
+<h1>{{ book.metaData['title'] }}</h1>
+Author: {{ book.metaData['title'] }}
+<br/>
+Release Date: {{ book.metaData['releaseDate'] }}
+<br/>
+Language: {{ book.metaData['language'] }}
+<br/>
+<a href="https://storage.googleapis.com{{ book.metaData['fileLocation'] }}">Full Text</a>
+
+<br/>
+<br/>
+Words:
+<br/>
+{% for tempWord in book.words %}
+    <li><a href="{{ tempWord.href }}">{{ tempWord.text }}</a> - {{ tempWord.count }}</li>
+{% endfor %}
+
+</body>
+</html>

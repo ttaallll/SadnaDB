@@ -24,6 +24,7 @@ import MySQLdb
 from myconfig import *
 from feeder import *
 from storage import *
+from book import *
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__) + '/templates'),
@@ -103,6 +104,24 @@ class UploadFileHandler(webapp2.RequestHandler):
         self.response.write(bookUrl)
 
 
+class ShowBookTaskHandler(webapp2.RequestHandler):
+    def get(self):
+        bookId = self.request.get('id')
+
+        requestContext = createRequestContext()
+
+        book = getBookForTemplate(requestContext, bookId)
+
+        clearRequestContext(requestContext)
+
+        template_values = {
+            'book': book
+        }
+
+        template = JINJA_ENVIRONMENT.get_template('book.html')
+        self.response.write(template.render(template_values))
+
+
 class AddBookTaskHandler(webapp2.RequestHandler):
     def post(self):
         bookUrl = self.request.get('bookUrl')
@@ -123,12 +142,12 @@ class MainHandler(webapp2.RequestHandler):
     def get(self):
 
         requestContext = createRequestContext()
-        lastBook = getLastBookFromDB(requestContext)
+        lastBooks = getLastNBookFromDB(requestContext, 5)
         clearRequestContext(requestContext)
 
         template_values = {
             'user': 1,
-            'lastBook': lastBook
+            'lastBooks': lastBooks
         }
 
         template = JINJA_ENVIRONMENT.get_template('index.html')
@@ -138,4 +157,5 @@ app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/upload', UploadFileHandler),
     ('/addBookTask', AddBookTaskHandler),
+    ('/book', ShowBookTaskHandler),
 ], debug=True)

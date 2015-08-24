@@ -6,6 +6,7 @@
 </head>
 <body>
 
+Add new Book:
 <form action="/upload" method="post" enctype="multipart/form-data">
     <input type="file" name="file"/>
     <br/>
@@ -13,9 +14,25 @@
 </form>
 
 <br/>
-Last book:
+Last books:
 <br/>
-{{ lastBook }}
+
+<table>
+    <tr>
+        <td>Name</td>
+        <td>Author</td>
+        <td>releaseDate</td>
+        <td>Language</td>
+    </tr>
+{% for tempBook in lastBooks %}
+    <tr>
+        <td><a href="/book?id={{ tempBook[0] }}">{{ tempBook[1] }}</a></td>
+        <td>{{ tempBook[2] }}</td>
+        <td>{{ tempBook[3] }}</td>
+        <td>{{ tempBook[4] }}</td>
+    </tr>
+{% endfor %}
+</table>
 
 </body>
 </html>

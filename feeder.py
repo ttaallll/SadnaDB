@@ -24,6 +24,21 @@ def getLastBookFromDB(rc):
     return bookData
 
 
+def getLastNBookFromDB(rc, n):
+
+    cursor = rc["db"].cursor()
+    query = 'SELECT * FROM sadnadb.books ORDER BY id DESC LIMIT %s'
+    cursor.execute(query, n)
+    result = cursor.fetchall()
+
+    bookData = []
+    for r in result:
+        if len(r) != 0:
+            bookData += [r]
+
+    return bookData
+
+
 def addBookToDB(rc, bookUrl, siteFormat):
 
     bookText = geFromStorage(bookUrl)
