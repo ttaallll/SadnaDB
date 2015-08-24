@@ -33,6 +33,21 @@ def getBook(rc, bookId):
     return {'words': words, 'metaData': metaData}
 
 
+def getLanguageNameById(rc, languageId):
+    cursor = rc["db"].cursor()
+
+    selectQuery = 'SELECT name FROM sadnadb.languages WHERE id = %s'
+    cursor.execute(selectQuery, languageId)
+    result = cursor.fetchall()
+
+    language = 0
+    for r in result:
+        if len(r) != 0:
+            language = r[0]
+
+    return language
+
+
 def getBookForTemplate(rc, bookId):
 
     book = getBook(rc, bookId)
@@ -44,4 +59,7 @@ def getBookForTemplate(rc, bookId):
                    'count': tempWord['count']
                    }]
 
-    return {'words': words, 'metaData': book['metaData']}
+    metaData = book['metaData']
+    metaData['language'] = getLanguageNameById(rc, book['metaData']['language']).title()
+
+    return {'words': words, 'metaData': metaData}
