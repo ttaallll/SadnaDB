@@ -21,7 +21,7 @@ Language: {{ book.metaData['language'] }}
 Words:
 <br/>
 {% for tempWord in book.words %}
-    <li><a href="{{ tempWord.href }}">{{ tempWord.text }}</a> - {{ tempWord.count }}</li>
+    <li><a href="{{ tempWord.href }}&bookId={{ bookId }}">{{ tempWord.text }}</a> - {{ tempWord.count }}</li>
 {% endfor %}
 
 </body>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>word - {{ word.wordText }}</title>
+</head>
+<body>
+
+
+<h1>{{ word.wordText }}</h1>
+
+<br/>
+<br/>
+Books:
+<br/>
+{% for temp in word.books %}
+    <li><a href="/book?id={{ temp.id }}">{{ temp.title }}</a> - {{ temp.count }}</li>
+{% endfor %}
+
+</body>
+</html>

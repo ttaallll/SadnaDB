@@ -25,6 +25,7 @@ from myconfig import *
 from feeder import *
 from storage import *
 from book import *
+from words import *
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__) + '/templates'),
@@ -104,7 +105,7 @@ class UploadFileHandler(webapp2.RequestHandler):
         self.response.write(bookUrl)
 
 
-class ShowBookTaskHandler(webapp2.RequestHandler):
+class ShowBookHandler(webapp2.RequestHandler):
     def get(self):
         bookId = self.request.get('id')
 
@@ -115,10 +116,33 @@ class ShowBookTaskHandler(webapp2.RequestHandler):
         clearRequestContext(requestContext)
 
         template_values = {
-            'book': book
+            'book': book,
+            'bookId': bookId
         }
 
         template = JINJA_ENVIRONMENT.get_template('book.html')
+        self.response.write(template.render(template_values))
+
+
+class ShowWordHandler(webapp2.RequestHandler):
+    def get(self):
+        wordId = self.request.get('id')
+
+        bookId = None
+        if 'bookId' in self.request.GET:
+            bookId = self.request.get('bookId')
+
+        requestContext = createRequestContext()
+
+        word = getWordForTemplate(requestContext, wordId, bookId)
+
+        clearRequestContext(requestContext)
+
+        template_values = {
+            'word': word
+        }
+
+        template = JINJA_ENVIRONMENT.get_template('word.html')
         self.response.write(template.render(template_values))
 
 
@@ -157,5 +181,6 @@ app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/upload', UploadFileHandler),
     ('/addBookTask', AddBookTaskHandler),
-    ('/book', ShowBookTaskHandler),
+    ('/book', ShowBookHandler),
+    ('/word', ShowWordHandler),
 ], debug=True)

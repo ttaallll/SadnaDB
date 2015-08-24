@@ -177,26 +177,42 @@ def insertWordsInBooks(rc, wordsInBooks):
     if len(wordsInBooks) == 0:
         return
 
-    try:
-        # insert to table words the not existed
-        cursor = rc["db"].cursor()
-        query = 'INSERT INTO sadnadb.wordsInBooks (' \
-                ' wordId,' \
-                ' bookId,' \
-                ' lineNumber,' \
-                ' wordNumber,' \
-                ' characterLocation,' \
-                ' sentenceNumber,' \
-                ' paragraphNumber)' \
-                ' VALUES (%s, %s, %s, %s, %s, %s, %s)'
-        cursor.executemany(query, wordsInBooks)
-        rc["db"].commit()
+    # try:
+    #     # insert to table words the not existed
+    #     cursor = rc["db"].cursor()
+    #     query = 'INSERT INTO sadnadb.wordsInBooks (' \
+    #             ' wordId,' \
+    #             ' bookId,' \
+    #             ' lineNumber,' \
+    #             ' wordNumber,' \
+    #             ' characterLocation,' \
+    #             ' sentenceNumber,' \
+    #             ' paragraphNumber)' \
+    #             ' VALUES (%s, %s, %s, %s, %s, %s, %s)'
+    #     cursor.executemany(query, wordsInBooks)
+    #     rc["db"].commit()
+    #
+    #     print 'insert words in books - ' + str(len(wordsInBooks)) + ' ' + str([x[0] for x in wordsInBooks])
+    #
+    # except Exception as e:
+    #     print e
+    #     print 'probably duplicate'
 
-        print 'insert words in books - ' + str(len(wordsInBooks)) + ' ' + str([x[0] for x in wordsInBooks])
+    # insert to table words the not existed
+    cursor = rc["db"].cursor()
+    query = 'INSERT INTO sadnadb.wordsInBooks (' \
+            ' wordId,' \
+            ' bookId,' \
+            ' lineNumber,' \
+            ' wordNumber,' \
+            ' characterLocation,' \
+            ' sentenceNumber,' \
+            ' paragraphNumber)' \
+            ' VALUES (%s, %s, %s, %s, %s, %s, %s)'
+    cursor.executemany(query, wordsInBooks)
+    rc["db"].commit()
 
-    except Exception as e:
-        print e
-        print 'probably duplicate'
+    print 'insert words in books - ' + str(len(wordsInBooks)) + ' ' + str([x[0] for x in wordsInBooks])
 
 
 def checkIfWordsExists(rc, words):
@@ -223,3 +239,40 @@ def checkIfWordsExists(rc, words):
             notExists += [(tempWord,)]
 
     return exists, notExists
+
+
+def getWordForTemplate(rc, wordId, bookId):
+
+    cursor = rc["db"].cursor()
+
+    # get all books contain the word
+    selectQuery = 'SELECT b.id, b.title, COUNT(b.id) ' \
+                  'FROM sadnadb.books b, sadnadb.wordsInBooks wb ' \
+                  'WHERE wb.wordId = %s and wb.bookId = b.id ' \
+                  'GROUP BY b.id'
+    cursor.execute(selectQuery, wordId)
+    result = cursor.fetchall()
+
+    books = []
+    for r in result:
+        if len(r) != 0:
+            books += [{'id': r[0], 'title': r[1], 'count': r[2]}]
+
+    ####
+
+    selectQuery = 'SELECT word FROM sadnadb.words WHERE id = %s'
+    cursor.execute(selectQuery, wordId)
+    result = cursor.fetchall()
+
+    wordText = result[0][0]
+
+    ####
+
+    if bookId is not None:
+        selectQuery = 'SELECT *' \
+                      'FROM sadnadb.books b, sadnadb.wordsInBooks wb ' \
+                      'WHERE wb.wordId = %s and wb.bookId = b.id and b.id = %s '
+        cursor.execute(selectQuery, (wordId, bookId))
+        result = cursor.fetchall()
+
+    return {'books': books, 'wordText': wordText}

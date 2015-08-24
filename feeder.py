@@ -147,20 +147,20 @@ def getLanguageId(rc, languageName):
 def insertBook(rc, metadata, bookUrl):
 
     cursor = rc["db"].cursor()
-    cursor.execute('INSERT INTO {0} ({1}, {2}, {3}, {4}, {5}) VALUES (\'{6}\', \'{7}\', \'{8}\', \'{9}\', \'{10}\')'.format(
-        'sadnadb.books',
-        'title',
-        'author',
-        'releaseDate',
-        'language',
-        'fileLocation',
-
-        metadata['title'],
-        metadata['author'],
-        metadata['releaseDate'],
-        getLanguageId(rc, metadata['language']),
-        bookUrl
-    ))
+    cursor.execute('INSERT INTO sadnadb.books ('
+                   'title,'
+                   ' author,'
+                   ' releaseDate,'
+                   ' language,'
+                   ' fileLocation'
+                   ')'
+                   ' VALUES (%s, %s, %s, %s, %s)',
+                   (metadata['title'],
+                    metadata['author'],
+                    metadata['releaseDate'],
+                    getLanguageId(rc, metadata['language']),
+                    bookUrl)
+                   )
 
     rc["db"].commit()
 
