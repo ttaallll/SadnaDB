@@ -56,7 +56,7 @@ CREATE TABLE phrases (
 	PRIMARY KEY (id)
 );
 
-CREATE TABLE wordsInphrases (
+CREATE TABLE wordsInPhrases (
 	wordId int,
 	phraseId int,
 	orderNumber int,

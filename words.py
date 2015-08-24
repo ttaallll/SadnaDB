@@ -28,11 +28,11 @@ def addAllWords(rc, bookLines, bookId, startBookChar):
             addWords(rc, currentWords)
             currentWords = []
 
-        addWordsInBooks(rc, currentWordsThisLine, currentLine, currentParagraph, bookId, currentChar, currentWordsCount)
+        realWordsCount = addWordsInBooks(rc, currentWordsThisLine, currentLine, currentParagraph, bookId, currentChar, currentWordsCount)
 
         print currentLine
 
-        currentWordsCount += len(currentWordsThisLine)
+        currentWordsCount += realWordsCount
         currentChar += len(tempLine) + 2
         currentLine += 1
         if tempLine == '':
@@ -40,6 +40,10 @@ def addAllWords(rc, bookLines, bookId, startBookChar):
 
 
 def addWordsInBooks(rc, words, lineNumber, paragraphNumber, bookId, startLineChar, startLineWordsCount):
+
+    realWordsCount = 0
+    currentWordCount = startLineWordsCount
+    currentChar = startLineChar
 
     for tempWord in words:
         newTempWord = tempWord.replace("'", "\\'")
@@ -49,6 +53,7 @@ def addWordsInBooks(rc, words, lineNumber, paragraphNumber, bookId, startLineCha
         newTempWord = newTempWord.lower()
 
         if len(newTempWord) == 0:
+            currentChar += 1
             continue
 
         cursor = rc["db"].cursor()
@@ -70,12 +75,15 @@ def addWordsInBooks(rc, words, lineNumber, paragraphNumber, bookId, startLineCha
                 ' characterLocation,' \
                 ' sentenceNumber,' \
                 ' paragraphNumber)' \
-                ' VALUES (%s, %s, %s, %s, %s, %s, %s)' % (wordId, bookId, lineNumber, startLineWordsCount, startLineChar, 0, paragraphNumber)
+                ' VALUES (%s, %s, %s, %s, %s, %s, %s)' % (wordId, bookId, lineNumber, currentWordCount, currentChar, 0, paragraphNumber)
         cursor.execute(query)
         rc["db"].commit()
 
-        startLineWordsCount += 1
-        startLineChar += len(tempWord) + 1
+        realWordsCount += 1
+        currentWordCount += 1
+        currentChar += len(tempWord) + 1
+
+    return realWordsCount
 
 
 def fixWords(words):
