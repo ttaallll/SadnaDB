@@ -3,7 +3,7 @@ __author__ = 'pais'
 from datetime import datetime
 
 from words import addAllWords
-from storage import geFromStorage
+from storage import getFromStorage
 
 siteFormats = [
     'gutenberg',
@@ -41,7 +41,7 @@ def getLastNBookFromDB(rc, n):
 
 def addBookToDB(rc, bookUrl, siteFormat):
 
-    bookText = geFromStorage(bookUrl)
+    bookText = getFromStorage(bookUrl)
 
     bookData = {
         'bookUrl': bookUrl,
@@ -100,6 +100,7 @@ def parseGutenberg(bookData):
     bookData['metadata'] = metadata1
     bookData['bookLines'] = bookLines
     bookData['startBookChar'] = startBookChar
+    bookData['startBookLine'] = startBookLine
 
 
 def addNewBook(rc, bookData):
@@ -108,10 +109,11 @@ def addNewBook(rc, bookData):
     bookLines = bookData['bookLines']
     bookUrl = bookData['bookUrl']
     startBookChar = bookData['startBookChar']
+    startBookLine = bookData['startBookLine']
 
     bookId = insertBook(rc, metadata, bookUrl)
 
-    addAllWords(rc, bookLines, bookId, startBookChar)
+    addAllWords(rc, bookLines, bookId, startBookChar, startBookLine)
 
 
 

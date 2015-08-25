@@ -1,8 +1,10 @@
 __author__ = 'tal'
 
+from storage import getFromStorage
+
 import re
 
-LINES_OF_BULK_WORDS = 3
+LINES_OF_BULK_WORDS = 6
 chars_to_remove = ['.', '!', '?', ',',
                    ':', ';', '"', '\'',
                    '\\', '_', '[', ']',
@@ -12,7 +14,7 @@ chars_to_remove = ['.', '!', '?', ',',
                    '-', '=', '+', '~']
 
 
-def addAllWords(rc, bookLines, bookId, startBookChar):
+def addAllWords(rc, bookLines, bookId, startBookChar, startBookLine):
 
     print 'num of lines - ' + str(len(bookLines))
 
@@ -64,7 +66,14 @@ def addAllWords(rc, bookLines, bookId, startBookChar):
             insertWordsInBooks(rc, wordsInBooksToInsert)
             wordsInBooksToInsert = []
 
-        tempWordsInBooksToInsert, realWordsCount = createQueryValuesWordsInBooks(rc, currentWordsThisLine, currentLine, currentParagraph, bookId, currentChar, currentWordsCount)
+        tempWordsInBooksToInsert, realWordsCount = createQueryValuesWordsInBooks(
+            rc,
+            currentWordsThisLine,
+            startBookLine + currentLine,
+            currentParagraph,
+            bookId,
+            currentChar,
+            currentWordsCount)
 
         wordsInBooksToInsert += tempWordsInBooksToInsert
 
@@ -259,7 +268,7 @@ def getWordForTemplate(rc, wordId, bookId):
             books += [{'id': r[0], 'title': r[1], 'count': r[2]}]
 
     ####
-
+    # get the word text
     selectQuery = 'SELECT word FROM sadnadb.words WHERE id = %s'
     cursor.execute(selectQuery, wordId)
     result = cursor.fetchall()
@@ -267,12 +276,56 @@ def getWordForTemplate(rc, wordId, bookId):
     wordText = result[0][0]
 
     ####
-
+    # get the location where the word is appearing the book
+    locations = None
     if bookId is not None:
-        selectQuery = 'SELECT *' \
-                      'FROM sadnadb.books b, sadnadb.wordsInBooks wb ' \
-                      'WHERE wb.wordId = %s and wb.bookId = b.id and b.id = %s '
-        cursor.execute(selectQuery, (wordId, bookId))
-        result = cursor.fetchall()
+        locations = getLocationsOfWordInBook(rc, wordId, bookId, wordText)
 
-    return {'books': books, 'wordText': wordText}
+    return {'books': books, 'wordText': wordText, 'locations': locations}
+
+
+def getLocationsOfWordInBook(rc, wordId, bookId, wordText):
+
+    cursor = rc["db"].cursor()
+
+    selectQuery = 'SELECT *' \
+                  'FROM sadnadb.wordsInBooks wb, sadnadb.books b ' \
+                  'WHERE wb.wordId = %s and wb.bookId = b.id and b.id = %s '
+    cursor.execute(selectQuery, (wordId, bookId))
+    result = cursor.fetchall()
+
+    wordLocations = []
+    bookFileLocation = result[0][12]
+    for r in result:
+        wordLocations += [{
+            'lineNumber': r[2],
+            'wordNumber': r[3],
+            'charLocation': r[4],
+            'sentenceNumber': r[5],
+            'paragraphNumber': r[6]
+        }]
+
+    bookText = getFromStorage(bookFileLocation)
+
+    bookLines = bookText.split('\r\n')
+
+    for temp in wordLocations:
+        ln = temp['lineNumber']
+
+        tempLine = bookLines[ln].lower()
+        tempPos = tempLine.find(wordText)
+
+        if tempPos != -1:
+            parts = [bookLines[ln][:tempPos], bookLines[ln][tempPos + len(wordText):]]
+
+            temp['cite1'] = bookLines[ln - 1] + '\r\n' + parts[0]
+
+            temp['cite2'] = parts[1] + '\r\n' + bookLines[ln + 1]
+
+            temp['originalWordText'] = bookLines[ln][tempPos:tempPos + len(wordText)]
+        else:
+            temp['cite'] = bookLines[ln - 1] + '\r\n' + \
+                           bookLines[ln] + '\r\n' + \
+                           bookLines[ln + 1]
+
+    return wordLocations

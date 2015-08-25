@@ -9,13 +9,39 @@
 
 <h1>{{ word.wordText }}</h1>
 
+<h3>Locations:</h3>
+
+{% if 'locations' in word %}
+{% for temp in word.locations %}
+<br/>
+<div style="font-size: small;">
+    Word#: {{ temp.wordNumber }}, Line#: {{ temp.lineNumber }}<br/>
+    Paragraph#: {{ temp.paragraphNumber }}, Sentence#: {{ temp.sentenceNumber }}<br/>
+    Character#: {{ temp.charLocation }}<br/>
+</div>
+<br/>
+{% if 'cite1' in temp %}
+{{ temp.cite1 }}<b>{{ temp.originalWordText }}</b>{{ temp.cite2 }}
+{% endif %}
+
+{% if 'cite' in temp %}
+{{ temp.cite }}
+{% endif %}
+
+<br/>
+<br/>
+{% endfor %}
+{% endif %}
+
 <br/>
 <br/>
 Books:
 <br/>
+{% if 'books' in word %}
 {% for temp in word.books %}
     <li><a href="/book?id={{ temp.id }}">{{ temp.title }}</a> - {{ temp.count }}</li>
 {% endfor %}
+{% endif %}
 
 </body>
 </html>

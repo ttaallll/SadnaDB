@@ -29,7 +29,7 @@ def uploadToStorage(bookName, bookText):
     return filename
 
 
-def geFromStorage(bookUrl):
+def getFromStorage(bookUrl):
 
     gcs_file = gcs.open(bookUrl)
 
@@ -37,3 +37,7 @@ def geFromStorage(bookUrl):
     gcs_file.close()
 
     return data
+
+
+def createStorageUrl(bookLocation):
+    return 'https://storage.googleapis.com' + bookLocation
