@@ -44,7 +44,6 @@ In book: <a href="/book?id={{ word.book.id }}">{{ word.book.title }}</a>
 {% if word.books %}
 
 <h3>Books:</h3>
-<br/>
 
 {% for temp in word.books %}
     <li><a href="/book?id={{ temp.id }}">{{ temp.title }}</a> - {{ temp.count }}</li>
