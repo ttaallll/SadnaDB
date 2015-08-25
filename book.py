@@ -13,7 +13,11 @@ def getBookMetaData(rc, bookId):
     metaData = {}
     for r in result:
         if len(r) != 0:
-            metaData = {'id': r[0], 'title': r[1], 'author': r[2], 'releaseDate': r[3], 'language': r[4],
+            metaData = {'id': r[0],
+                        'title': r[1],
+                        'author': r[2],
+                        'releaseDate': r[3],
+                        'language': r[4],
                         'fileLocation': r[5]}
 
     return metaData

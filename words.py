@@ -5,7 +5,7 @@ from book import getBookMetaData
 
 import re
 
-LINES_OF_BULK_WORDS = 6
+LINES_OF_BULK_WORDS = 20
 chars_to_remove = ['.', '!', '?', ',',
                    ':', ';', '"', '\'',
                    '\\', '_', '[', ']',
@@ -331,14 +331,16 @@ def getLocationsOfWordInBook(rc, wordId, bookId, wordText):
         if tempPos != -1:
             parts = [bookLines[ln][:tempPos], bookLines[ln][tempPos + len(wordText):]]
 
-            temp['cite1'] = bookLines[ln - 1] + '\r\n' + parts[0]
+            temp['cite1'] = bookLines[ln - 1].decode('utf-8') + '\r\n' + parts[0].decode('utf-8')
 
-            temp['cite2'] = parts[1] + '\r\n' + bookLines[ln + 1]
+            temp['cite2'] = parts[1].decode('utf-8') + '\r\n' + bookLines[ln + 1].decode('utf-8')
 
-            temp['originalWordText'] = bookLines[ln][tempPos:tempPos + len(wordText)]
+            temp['originalWordText'] = bookLines[ln][tempPos:tempPos + len(wordText)].decode('utf-8')
         else:
             temp['cite'] = bookLines[ln - 1] + '\r\n' + \
                            bookLines[ln] + '\r\n' + \
                            bookLines[ln + 1]
+
+            temp['cite'] = temp['cite'].decode('utf-8')
 
     return wordLocations
