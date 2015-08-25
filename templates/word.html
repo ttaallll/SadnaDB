@@ -9,17 +9,21 @@
 
 <h1>{{ word.wordText }}</h1>
 
+
+{% if word.locations %}
+
 <h3>Locations:</h3>
 
-{% if 'locations' in word %}
-{% for temp in word.locations %}
+In book: <a href="/book?id={{ word.book.id }}">{{ word.book.title }}</a>
 <br/>
+<br/>
+
+{% for temp in word.locations %}
 <div style="font-size: small;">
     Word#: {{ temp.wordNumber }}, Line#: {{ temp.lineNumber }}<br/>
     Paragraph#: {{ temp.paragraphNumber }}, Sentence#: {{ temp.sentenceNumber }}<br/>
     Character#: {{ temp.charLocation }}<br/>
 </div>
-<br/>
 {% if 'cite1' in temp %}
 {{ temp.cite1 }}<b>{{ temp.originalWordText }}</b>{{ temp.cite2 }}
 {% endif %}
@@ -30,14 +34,18 @@
 
 <br/>
 <br/>
+<br/>
 {% endfor %}
 {% endif %}
 
 <br/>
+
+
+{% if word.books %}
+
+<h3>Books:</h3>
 <br/>
-Books:
-<br/>
-{% if 'books' in word %}
+
 {% for temp in word.books %}
     <li><a href="/book?id={{ temp.id }}">{{ temp.title }}</a> - {{ temp.count }}</li>
 {% endfor %}

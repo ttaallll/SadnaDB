@@ -1,6 +1,7 @@
 __author__ = 'tal'
 
 from storage import getFromStorage
+from book import getBookMetaData
 
 import re
 
@@ -252,6 +253,8 @@ def checkIfWordsExists(rc, words):
 
 def getWordForTemplate(rc, wordId, bookId):
 
+    wordResult = {}
+
     cursor = rc["db"].cursor()
 
     # get all books contain the word
@@ -267,6 +270,8 @@ def getWordForTemplate(rc, wordId, bookId):
         if len(r) != 0:
             books += [{'id': r[0], 'title': r[1], 'count': r[2]}]
 
+    wordResult['books'] = books
+
     ####
     # get the word text
     selectQuery = 'SELECT word FROM sadnadb.words WHERE id = %s'
@@ -275,13 +280,21 @@ def getWordForTemplate(rc, wordId, bookId):
 
     wordText = result[0][0]
 
+    wordResult['wordText'] = wordText
+
     ####
     # get the location where the word is appearing the book
-    locations = None
     if bookId is not None:
         locations = getLocationsOfWordInBook(rc, wordId, bookId, wordText)
 
-    return {'books': books, 'wordText': wordText, 'locations': locations}
+        wordResult['locations'] = locations
+
+    ###
+    # get book metaData
+    metaData = getBookMetaData(rc, bookId)
+    wordResult['book'] = metaData
+
+    return wordResult
 
 
 def getLocationsOfWordInBook(rc, wordId, bookId, wordText):
