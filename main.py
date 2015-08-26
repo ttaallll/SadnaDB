@@ -146,6 +146,31 @@ class ShowWordHandler(webapp2.RequestHandler):
         self.response.write(template.render(template_values))
 
 
+class SearchWordInBookHandler(webapp2.RequestHandler):
+    def get(self):
+
+        rc = createRequestContext()
+
+        bookId = self.request.get('bookId')
+
+        if 'wordNumber' in self.request.GET and self.request.get('wordNumber') != '':
+            wordId = getWordByLocation(rc, bookId, 'wordNumber', self.request.get('wordNumber'))
+        elif 'lineNumber' in self.request.GET and self.request.get('lineNumber') != '' and \
+             'wordInLine' in self.request.GET and self.request.get('wordInLine') != '':
+            wordId = getWordByLocation(rc, bookId, 'wordInLine', (self.request.get('lineNumber'), self.request.get('wordInLine')))
+        else:
+            self.response.write('bad params to search')
+            clearRequestContext(rc)
+            return
+
+        clearRequestContext(rc)
+
+        if wordId:
+            self.redirect('/word?id=' + str(wordId) + '&bookId=' + bookId)
+        else:
+            self.redirect('/notFound')
+
+
 class SearchHandler(webapp2.RequestHandler):
     def get(self):
 
@@ -163,7 +188,6 @@ class SearchHandler(webapp2.RequestHandler):
                 self.redirect('/word?id=' + str(wordId))
             else:
                 self.redirect('/notFound?x=' + self.request.get('wordName'))
-
             return
 
         elif 'title' in self.request.GET and self.request.get('title') != '':
@@ -243,4 +267,5 @@ app = webapp2.WSGIApplication([
     ('/word', ShowWordHandler),
     ('/search', SearchHandler),
     ('/notFound', NotFoundHandler),
+    ('/searchWordInBook', SearchWordInBookHandler),
 ], debug=True)

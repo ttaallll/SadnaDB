@@ -365,3 +365,29 @@ def getWordByName(rc, wordName):
         return result[0][0]
 
     return None
+
+
+def getWordByLocation(rc, bookId, locationType, value):
+
+    if locationType == 'wordNumber':
+        where1 = 'wordNumber = %s'
+    elif locationType == 'wordInLine':
+        where1 = 'lineNumber = %s and wordNumberInLine = %s'
+
+    cursor = rc["db"].cursor()
+
+    selectQuery = 'SELECT *' \
+                  'FROM sadnadb.wordsInBooks ' \
+                  'WHERE bookId = %s and ' + where1
+
+    if type(value) == tuple:
+        values = (bookId,) + value
+    else:
+        values = (bookId, value)
+    cursor.execute(selectQuery, values)
+    result = cursor.fetchall()
+
+    if len(result) > 0:
+        return result[0][0]
+
+    return None
