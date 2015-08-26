@@ -8,11 +8,11 @@
 
 
 <h1>{{ book.metaData['title'] }}</h1>
-Author: {{ book.metaData['author'] }}
+<i><b>Author</b></i>: {{ book.metaData['author'] }}
 <br/>
-Release Date: {{ book.metaData['releaseDate'] }}
+<i><b>Release Date</b></i>: {{ book.metaData['releaseDate'] }}
 <br/>
-Language: {{ book.metaData['language'] }}
+<i><b>Language</b></i>: {{ book.metaData['language'] }}
 <br/>
 <a href="https://storage.googleapis.com{{ book.metaData['fileLocation'] }}">Full Text</a>
 
