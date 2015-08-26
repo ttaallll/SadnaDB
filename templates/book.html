@@ -15,11 +15,18 @@
 <i><b>Language</b></i>: {{ book.metaData['language'] }}
 <br/>
 <a href="https://storage.googleapis.com{{ book.metaData['fileLocation'] }}">Full Text</a>
+<br/>
+<br/>
+
+<h3>Search</h3>
+<form action="/searchWordInBook">
+    word number: <input type="text" name="wordNumber"><br/>
+    line number: <input type="text" name="lineNumber"> word in line: <input type="text" name="wordInLine"><br/>
+    <input type="submit" value="search">
+</form>
 
 <br/>
-<br/>
-Words:
-<br/>
+<h3>Words</h3>
 {% for tempWord in book.words %}
     <li><a href="{{ tempWord.href }}&bookId={{ bookId }}">{{ tempWord.text }}</a> - {{ tempWord.count }}
         <i style="font-size: 10px">
