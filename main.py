@@ -146,6 +146,53 @@ class ShowWordHandler(webapp2.RequestHandler):
         self.response.write(template.render(template_values))
 
 
+class SearchHandler(webapp2.RequestHandler):
+    def get(self):
+
+        rc = createRequestContext()
+
+        results = {}
+        searchValue = None
+
+        if 'wordName' in self.request.GET and self.request.get('wordName') != '':
+            wordId = getWordByName(rc, self.request.get('wordName'))
+
+            clearRequestContext(rc)
+
+            if wordId:
+                self.redirect('/word?id=' + str(wordId))
+            else:
+                self.redirect('/notFound?x=' + self.request.get('wordName'))
+
+            return
+
+        elif 'title' in self.request.GET and self.request.get('title') != '':
+            searchValue = self.request.get('title')
+            results['books'] = getBooksByMetadata(rc, 'title', searchValue)
+        elif 'author' in self.request.GET and self.request.get('author') != '':
+            searchValue = self.request.get('author')
+            results['books'] = getBooksByMetadata(rc, 'author', searchValue)
+        elif 'releaseDate' in self.request.GET and self.request.get('releaseDate') != '':
+            searchValue = self.request.get('releaseDate')
+            results['books'] = getBooksByMetadata(rc, 'releaseDate', searchValue)
+        elif 'language' in self.request.GET and self.request.get('language') != '':
+            searchValue = self.request.get('language')
+            results['books'] = getBooksByMetadata(rc, 'language', searchValue)
+
+        clearRequestContext(rc)
+
+        if 'books' in results and len(results['books']) == 0:
+            self.redirect('/notFound?x=' + searchValue)
+            return
+
+        template_values = {
+            'results': results
+        }
+
+        template = JINJA_ENVIRONMENT.get_template('searchResults.html')
+        self.response.write(template.render(template_values))
+
+
 class AddBookTaskHandler(webapp2.RequestHandler):
     def post(self):
         bookUrl = self.request.get('bookUrl')
@@ -177,10 +224,23 @@ class MainHandler(webapp2.RequestHandler):
         template = JINJA_ENVIRONMENT.get_template('index.html')
         self.response.write(template.render(template_values))
 
+
+class NotFoundHandler(webapp2.RequestHandler):
+    def get(self):
+
+        template_values = {}
+        if 'x' in self.request.GET:
+            template_values['x'] = self.request.get('x')
+
+        template = JINJA_ENVIRONMENT.get_template('notFound.html')
+        self.response.write(template.render(template_values))
+
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/upload', UploadFileHandler),
     ('/addBookTask', AddBookTaskHandler),
     ('/book', ShowBookHandler),
     ('/word', ShowWordHandler),
+    ('/search', SearchHandler),
+    ('/notFound', NotFoundHandler),
 ], debug=True)

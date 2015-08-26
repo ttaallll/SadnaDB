@@ -124,3 +124,25 @@ def getBookForTemplate(rc, bookId):
     metaData['language'] = getLanguageNameById(rc, book['metaData']['language']).title()
 
     return {'words': words, 'metaData': metaData}
+
+
+def getBooksByMetadata(rc, metaname, value):
+    cursor = rc["db"].cursor()
+
+    if metaname == 'title':
+        where1 = 'title = %s'
+    elif metaname == 'author':
+        where1 = 'author = %s'
+    elif metaname == 'releaseDate':
+        where1 = 'releaseDate = %s'
+    elif metaname == 'language':
+        where1 = 'language = %s'
+
+    selectQuery = 'SELECT * FROM sadnadb.books WHERE ' + where1
+    cursor.execute(selectQuery, value)
+    result = cursor.fetchall()
+
+    books = result
+
+    return books
+

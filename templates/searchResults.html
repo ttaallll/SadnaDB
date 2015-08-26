@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+
+<h1>Search Results</h1>
+
+
+{% if results.books %}
+<h3>Books</h3>
+
+<table>
+    <tr>
+        <td>Name</td>
+        <td>Author</td>
+        <td>Release Date</td>
+        <td>Language</td>
+    </tr>
+{% for tempBook in results.books %}
+    <tr>
+        <td><a href="/book?id={{ tempBook[0] }}">{{ tempBook[1] }}</a></td>
+        <td>{{ tempBook[2] }}</td>
+        <td>{{ tempBook[3] }}</td>
+        <td>{{ tempBook[4] }}</td>
+    </tr>
+{% endfor %}
+</table>
+
+{% endif %}
+
+</body>
+</html>

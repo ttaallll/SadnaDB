@@ -6,7 +6,7 @@
 </head>
 <body>
 
-Add new Book:
+<h1>Add new Book</h1>
 <form action="/upload" method="post" enctype="multipart/form-data">
     <input type="file" name="file"/>
     <br/>
@@ -14,14 +14,13 @@ Add new Book:
 </form>
 
 <br/>
-Last books:
-<br/>
+<h1>Last books</h1>
 
 <table>
     <tr>
         <td>Name</td>
         <td>Author</td>
-        <td>releaseDate</td>
+        <td>Release Date</td>
         <td>Language</td>
     </tr>
 {% for tempBook in lastBooks %}
@@ -33,6 +32,17 @@ Last books:
     </tr>
 {% endfor %}
 </table>
+
+<br/>
+<h1>Search</h1>
+<form action="/search">
+    word name: <input type="text" name="wordName"><br/>
+    book title: <input type="text" name="title"><br/>
+    author: <input type="text" name="author"><br/>
+    Release Date: <input type="text" name="releaseDate"><br/>
+    Language: <input type="text" name="language"><br/>
+    <input type="submit" value="search">
+</form>
 
 </body>
 </html>

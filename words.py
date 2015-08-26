@@ -286,17 +286,17 @@ def getWordForTemplate(rc, wordId, bookId):
 
     wordResult['wordText'] = wordText
 
-    ####
-    # get the location where the word is appearing the book
+    ###
     if bookId is not None:
+        ####
+        # get the location where the word is appearing the book
         locations = getLocationsOfWordInBook(rc, wordId, bookId, wordText)
-
         wordResult['locations'] = locations
 
-    ###
-    # get book metaData
-    metaData = getBookMetaData(rc, bookId)
-    wordResult['book'] = metaData
+        ###
+        # get book metaData
+        metaData = getBookMetaData(rc, bookId)
+        wordResult['book'] = metaData
 
     return wordResult
 
@@ -349,3 +349,19 @@ def getLocationsOfWordInBook(rc, wordId, bookId, wordText):
             temp['cite'] = temp['cite'].decode('utf-8')
 
     return wordLocations
+
+
+def getWordByName(rc, wordName):
+
+    cursor = rc["db"].cursor()
+
+    selectQuery = 'SELECT *' \
+                  'FROM sadnadb.words ' \
+                  'WHERE word = %s '
+    cursor.execute(selectQuery, wordName)
+    result = cursor.fetchall()
+
+    if len(result) > 0:
+        return result[0][0]
+
+    return None
