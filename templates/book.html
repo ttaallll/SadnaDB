@@ -21,7 +21,13 @@ Language: {{ book.metaData['language'] }}
 Words:
 <br/>
 {% for tempWord in book.words %}
-    <li><a href="{{ tempWord.href }}&bookId={{ bookId }}">{{ tempWord.text }}</a> - {{ tempWord.count }}</li>
+    <li><a href="{{ tempWord.href }}&bookId={{ bookId }}">{{ tempWord.text }}</a> - {{ tempWord.count }}
+        <i style="font-size: 10px">
+        {% for tempReference in tempWord.references %}
+        ({{ tempReference.wordNumber }}, {{ tempReference.lineNumber }}:{{ tempReference.wordNumberInLine }}),
+        {% endfor %}
+        </i>
+    </li>
 {% endfor %}
 
 </body>

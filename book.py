@@ -23,12 +23,11 @@ def getBookMetaData(rc, bookId):
     return metaData
 
 
-def getBook(rc, bookId):
-
+def getUniqueWordsInBook(rc, bookId):
     cursor = rc["db"].cursor()
 
     # get all words in the book
-    selectQuery = 'SELECT w.id, w.word, count(w.id) FROM sadnadb.words w, sadnadb.wordsInBooks wb ' \
+    selectQuery = 'SELECT *, count(w.id) FROM sadnadb.words w, sadnadb.wordsInBooks wb ' \
                   'WHERE wb.bookId = %s and wb.wordId = w.id ' \
                   'GROUP BY w.id'
     cursor.execute(selectQuery, bookId)
@@ -37,7 +36,52 @@ def getBook(rc, bookId):
     words = []
     for r in result:
         if len(r) != 0:
-            words += [{'id': r[0], 'text': r[1], 'count': r[2]}]
+            words += [{
+                'id': r[0],
+                'text': r[1],
+                'lineNumber': r[4],
+                'wordNumber': r[5],
+                'charLocation': r[6],
+                'sentenceNumber': r[7],
+                'paragraphNumber': r[8],
+                'count': r[9]}]
+
+    return words
+
+
+def getAllWordsInBook(rc, bookId):
+    cursor = rc["db"].cursor()
+
+    # get all words in the book
+    selectQuery = 'SELECT * FROM sadnadb.words w, sadnadb.wordsInBooks wb ' \
+                  'WHERE wb.bookId = %s and wb.wordId = w.id '
+    cursor.execute(selectQuery, bookId)
+    result = cursor.fetchall()
+
+    words = {}
+    for r in result:
+        if len(r) != 0:
+            tempWordId = r[0]
+            if tempWordId not in words:
+                words[tempWordId] = []
+
+            words[tempWordId] += [{
+                'id': r[0],
+                'text': r[1],
+                'lineNumber': r[4],
+                'wordNumber': r[5],
+                'charLocation': r[6],
+                'sentenceNumber': r[7],
+                'paragraphNumber': r[8],
+                'wordNumberInLine': r[9]
+            }]
+
+    return words
+
+
+def getBook(rc, bookId):
+
+    words = getAllWordsInBook(rc, bookId)
 
     #####
     # get metaData of the book
@@ -66,11 +110,15 @@ def getBookForTemplate(rc, bookId):
     book = getBook(rc, bookId)
 
     words = []
-    for tempWord in book['words']:
-        words += [{'text': tempWord['text'].decode('utf-8'),
-                   'href': '/word?id=' + str(tempWord['id']),
-                   'count': tempWord['count']
-                   }]
+    for tempWordKey in book['words']:
+        newWord = {}
+        newWord['references'] = book['words'][tempWordKey]
+
+        newWord['text'] = book['words'][tempWordKey][0]['text'].decode('utf-8')
+        newWord['href'] = '/word?id=' + str(book['words'][tempWordKey][0]['id'])
+        newWord['count'] = len(newWord['references'])
+
+        words += [newWord]
 
     metaData = book['metaData']
     metaData['language'] = getLanguageNameById(rc, book['metaData']['language']).title()

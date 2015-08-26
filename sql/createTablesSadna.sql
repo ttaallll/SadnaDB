@@ -30,6 +30,7 @@ CREATE TABLE wordsInBooks (
 	characterLocation int,
 	sentenceNumber int,
 	paragraphNumber int,
+	wordNumberInLine int,
 	FOREIGN KEY (wordId) REFERENCES words(id),
 	FOREIGN KEY (bookId) REFERENCES books(id),
 	PRIMARY KEY (wordId, bookId, wordNumber)

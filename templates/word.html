@@ -20,9 +20,9 @@ In book: <a href="/book?id={{ word.book.id }}">{{ word.book.title }}</a>
 
 {% for temp in word.locations %}
 <div style="font-size: small;">
-    Word#: {{ temp.wordNumber }}, Line#: {{ temp.lineNumber }}<br/>
+    Word#: {{ temp.wordNumber }}, Character#: {{ temp.charLocation }}<br/>
     Paragraph#: {{ temp.paragraphNumber }}, Sentence#: {{ temp.sentenceNumber }}<br/>
-    Character#: {{ temp.charLocation }}<br/>
+    Line#: {{ temp.lineNumber }}, Word in Line#: {{ temp.wordNumberInLine }}<br/>
 </div>
 {% if 'cite1' in temp %}
 {{ temp.cite1 }}<b>{{ temp.originalWordText }}</b>{{ temp.cite2 }}

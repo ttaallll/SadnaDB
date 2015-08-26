@@ -92,6 +92,7 @@ def addAllWords(rc, bookLines, bookId, startBookChar, startBookLine):
 def createQueryValuesWordsInBooks(rc, words, lineNumber, paragraphNumber, bookId, startLineChar, startLineWordsCount):
 
     realWordsCount = 0
+    currentWordInLine = 1
     currentWordCount = startLineWordsCount
     currentChar = startLineChar
 
@@ -129,9 +130,11 @@ def createQueryValuesWordsInBooks(rc, words, lineNumber, paragraphNumber, bookId
             currentWordCount,
             currentChar,
             0,
-            paragraphNumber
+            paragraphNumber,
+            currentWordInLine
         )]
 
+        currentWordInLine += 1
         realWordsCount += 1
         currentWordCount += 1
         currentChar += len(tempWord) + 1
@@ -217,8 +220,9 @@ def insertWordsInBooks(rc, wordsInBooks):
             ' wordNumber,' \
             ' characterLocation,' \
             ' sentenceNumber,' \
-            ' paragraphNumber)' \
-            ' VALUES (%s, %s, %s, %s, %s, %s, %s)'
+            ' paragraphNumber,' \
+            ' wordNumberInLine)' \
+            ' VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
     cursor.executemany(query, wordsInBooks)
     rc["db"].commit()
 
@@ -308,14 +312,15 @@ def getLocationsOfWordInBook(rc, wordId, bookId, wordText):
     result = cursor.fetchall()
 
     wordLocations = []
-    bookFileLocation = result[0][12]
+    bookFileLocation = result[0][13]
     for r in result:
         wordLocations += [{
             'lineNumber': r[2],
             'wordNumber': r[3],
             'charLocation': r[4],
             'sentenceNumber': r[5],
-            'paragraphNumber': r[6]
+            'paragraphNumber': r[6],
+            'wordNumberInLine': r[7]
         }]
 
     bookText = getFromStorage(bookFileLocation)
