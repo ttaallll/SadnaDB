@@ -11,7 +11,20 @@
 </head>
 <body>
 
-<h2 style="color: red">sorry, we couldnt found {{ x }}</h2>
+
+<h1>Word Group - {{ group.groupName }}</h1>
+
+{{ group.date }}
+
+<h3>Words</h3>
+
+
+{% for temp in group.words %}
+    <li>
+        <a href="/word?id={{ temp[0] }}">{{ temp[1] }}</a>
+    </li>
+{% endfor %}
+
 
 </body>
 </html>

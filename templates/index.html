@@ -2,7 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title></title>
+    <title>Sadna DB - Tal Pais</title>
+    <style>
+        * {
+            font-family: "Trebuchet MS", Helvetica, sans-serif;
+        }
+    </style>
 </head>
 <body>
 
@@ -43,6 +48,18 @@
     Language: <input type="text" name="language"><br/>
     <input type="submit" value="search">
 </form>
+
+<br/>
+<h1>Word Groups</h1>
+<h3>Add new group</h3>
+<form action="createGroup">
+    group name: <input type="text" name="groupName"><br/>
+    <input type="submit" value="add">
+</form>
+
+<h3>Last groups added</h3>
+
+<h3><a href="/groups">Show all groups</a></h3>
 
 </body>
 </html>

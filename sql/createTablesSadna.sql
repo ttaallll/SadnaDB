@@ -39,7 +39,7 @@ CREATE TABLE wordsInBooks (
 CREATE TABLE groupWords (
 	id int NOT NULL AUTO_INCREMENT,
 	name varchar(255),
-	dateCreated DATE,
+	dateCreated DATETIME DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (id)
 );
 

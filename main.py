@@ -26,6 +26,7 @@ from feeder import *
 from storage import *
 from book import *
 from words import *
+from group import *
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__) + '/templates'),
@@ -259,6 +260,40 @@ class NotFoundHandler(webapp2.RequestHandler):
         template = JINJA_ENVIRONMENT.get_template('notFound.html')
         self.response.write(template.render(template_values))
 
+
+class ShowGroupHandler(webapp2.RequestHandler):
+    def get(self):
+
+        groupId = self.request.get('id')
+
+        requestContext = createRequestContext()
+        group = getGroup(requestContext, groupId)
+        clearRequestContext(requestContext)
+
+        template_values = {
+            'group': group
+        }
+
+        template = JINJA_ENVIRONMENT.get_template('group.html')
+        self.response.write(template.render(template_values))
+
+
+class CreateGroupHandler(webapp2.RequestHandler):
+    def get(self):
+
+        rc = createRequestContext()
+
+        if 'groupName' in self.request.GET and self.request.get('groupName') != '':
+            groupId = createGroup(rc, self.request.get('groupName'))
+        else:
+            self.response.write('no name for group given')
+            clearRequestContext(rc)
+            return
+
+        clearRequestContext(rc)
+
+        self.redirect('/group?id=' + str(groupId))
+
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/upload', UploadFileHandler),
@@ -268,4 +303,6 @@ app = webapp2.WSGIApplication([
     ('/search', SearchHandler),
     ('/notFound', NotFoundHandler),
     ('/searchWordInBook', SearchWordInBookHandler),
+    ('/createGroup', CreateGroupHandler),
+    ('/group', ShowGroupHandler),
 ], debug=True)
