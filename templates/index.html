@@ -58,6 +58,11 @@
 </form>
 
 <h3>Last groups added</h3>
+{% for temp in lastGroups %}
+<li>
+    <a href="/group?id={{ temp[0] }}">{{ temp[1] }}</a>
+</li>
+{% endfor %}
 
 <h3><a href="/groups">Show all groups</a></h3>
 
