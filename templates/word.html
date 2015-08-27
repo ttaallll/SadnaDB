@@ -30,7 +30,7 @@ In book: <a href="/book?id={{ word.book.id }}">{{ word.book.title }}</a>
     Line#: {{ temp.lineNumber }}, Word in Line#: {{ temp.wordNumberInLine }}<br/>
 </div>
 {% if 'cite1' in temp %}
-{{ temp.cite1 }}<b>{{ temp.originalWordText }}</b>{{ temp.cite2 }}
+{{ temp.cite1 }}<b><mark>{{ temp.originalWordText }}</mark></b>{{ temp.cite2 }}
 {% endif %}
 
 {% if 'cite' in temp %}
@@ -51,7 +51,7 @@ In book: <a href="/book?id={{ word.book.id }}">{{ word.book.title }}</a>
 <h3>Books:</h3>
 
 {% for temp in word.books %}
-    <li><a href="/book?id={{ temp.id }}">{{ temp.title }}</a> - {{ temp.count }}</li>
+    <li><a href="/book?id={{ temp.id }}">{{ temp.title }}</a> - <a href="/word?id={{ word.id }}&bookId={{ temp.id }}">{{ temp.count }}</a></li>
 {% endfor %}
 {% endif %}
 

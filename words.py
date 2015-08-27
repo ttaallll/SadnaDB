@@ -257,7 +257,7 @@ def checkIfWordsExists(rc, words):
 
 def getWordForTemplate(rc, wordId, bookId):
 
-    wordResult = {}
+    wordResult = {'id': wordId}
 
     cursor = rc["db"].cursor()
 
