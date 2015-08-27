@@ -279,6 +279,23 @@ class ShowGroupHandler(webapp2.RequestHandler):
         self.response.write(template.render(template_values))
 
 
+class ShowGroupsHandler(webapp2.RequestHandler):
+    def get(self):
+
+        groupId = self.request.get('id')
+
+        requestContext = createRequestContext()
+        groups = getAllGroups(requestContext)
+        clearRequestContext(requestContext)
+
+        template_values = {
+            'groups': groups
+        }
+
+        template = JINJA_ENVIRONMENT.get_template('groups.html')
+        self.response.write(template.render(template_values))
+
+
 class AddWordToGroupHandler(webapp2.RequestHandler):
     def get(self):
 
@@ -340,6 +357,7 @@ app = webapp2.WSGIApplication([
     ('/searchWordInBook', SearchWordInBookHandler),
     ('/createGroup', CreateGroupHandler),
     ('/group', ShowGroupHandler),
+    ('/groups', ShowGroupsHandler),
     ('/addWordToGroup', AddWordToGroupHandler),
     ('/removeWordFromGroup', RemoveWordFromGroupHandler),
 ], debug=True)

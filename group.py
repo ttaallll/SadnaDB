@@ -43,6 +43,15 @@ def getGroup(rc, groupId):
     return groupDetails
 
 
+def getAllGroups(rc):
+    cursor = rc["db"].cursor()
+    query = 'SELECT * FROM sadnadb.groupWords ORDER BY id DESC'
+    cursor.execute(query)
+    result = cursor.fetchall()
+
+    return result
+
+
 def addWordToGroup(rc, groupId, word, textOrId=True):
 
     cursor = rc["db"].cursor()

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sadna DB - Tal Pais</title>
+    <style>
+        * {
+            font-family: "Trebuchet MS", Helvetica, sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+
+<h1>Word Groups</h1>
+
+
+<form action="createGroup">
+    <input type="text" name="groupName" placeholder="add new group">
+    <input type="submit" value="add">
+</form>
+
+
+<br/>
+{% for temp in groups %}
+<li>
+    <a href="/group?id={{ temp[0] }}">{{ temp[1] }}</a>
+</li>
+{% endfor %}
+
+
+</body>
+</html>
