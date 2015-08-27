@@ -35,5 +35,25 @@
 {% endfor %}
 
 
+<h3>Locations in books</h3>
+{% for tempBook in group.books %}
+<li>
+    <a href="/book?id={{ group.books[tempBook]['id'] }}">{{ group.books[tempBook]['title'] }}</a>
+    <ul>
+    {% for tempWord in group.books[tempBook]['words'] %}
+
+    <li>
+        <a href="/word?id={{ tempWord }}&bookId={{ tempBook }}">{{ group.books[tempBook]['words'][tempWord]['word'] }}</a> - {{ group.books[tempBook]['words'][tempWord]['count'] }}
+        <i style="font-size: 10px">
+        {% for tempReference in group.books[tempBook]['words'][tempWord]['locations'] %}
+        ({{ tempReference.wn }}, {{ tempReference.ln }}:{{ tempReference.wnil }}),
+        {% endfor %}
+        </i>
+    </li>
+    {% endfor %}
+    </ul>
+</li>
+{% endfor %}
+
 </body>
 </html>
