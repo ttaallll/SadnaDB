@@ -16,6 +16,14 @@
 
 {{ group.date }}
 
+<h3>Add new word</h3>
+<form action="addWordToGroup">
+    word: <input type="text" name="word"><br/>
+    <input type="submit" value="add">
+    <input type="hidden" name="groupId" value="{{ group.groupId }}">
+</form>
+
+
 <h3>Words</h3>
 
 

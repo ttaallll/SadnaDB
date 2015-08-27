@@ -27,7 +27,53 @@ def getGroup(rc, groupId):
     cursor.execute(query, groupId)
     result = cursor.fetchall()
 
+    groupDetails['groupId'] = groupId
     groupDetails['groupName'] = result[0][1]
     groupDetails['date'] = result[0][2]
 
+    ###
+    # get the words
+    query = 'SELECT w.id, w.word FROM sadnadb.wordsInGroupWords wg, sadnadb.words w ' \
+            'WHERE wg.groupWordId = %s AND wg.wordId = w.id'
+    cursor.execute(query, groupId)
+    result = cursor.fetchall()
+
+    groupDetails['words'] = result
+
     return groupDetails
+
+
+def addWordToGroup(rc, groupId, word, textOrId=True):
+
+    cursor = rc["db"].cursor()
+
+    wordId = None
+
+    if textOrId:
+        query = 'SELECT id FROM sadnadb.words ' \
+                'WHERE word = %s'
+        cursor.execute(query, word)
+        result = cursor.fetchall()
+
+        if len(result) == 0:
+            query = 'INSERT INTO sadnadb.words (word) ' \
+                    'VALUES (%s)'
+            cursor.execute(query, word)
+            rc["db"].commit()
+
+            query = 'SELECT id FROM sadnadb.words ' \
+                    'WHERE word = %s'
+            cursor.execute(query, word)
+            result = cursor.fetchall()
+
+        wordId = result[0][0]
+    else:
+        wordId = word
+
+    query = 'INSERT INTO sadnadb.wordsInGroupWords (wordId, groupWordId) ' \
+            'VALUES (%s, %s)'
+    cursor.execute(query, (wordId, groupId))
+    rc["db"].commit()
+
+
+

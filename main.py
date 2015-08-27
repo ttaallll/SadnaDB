@@ -278,6 +278,27 @@ class ShowGroupHandler(webapp2.RequestHandler):
         self.response.write(template.render(template_values))
 
 
+class AddWordToGroupHandler(webapp2.RequestHandler):
+    def get(self):
+
+        groupId = self.request.get('groupId')
+
+        word = None
+        textOrId = None
+        if 'word' in self.request.GET and self.request.get('word') != '':
+            textOrId = True
+            word = self.request.get('word')
+        elif 'wordId' in self.request.GET and self.request.get('wordId') != '':
+            textOrId = False
+            word = self.request.get('wordId')
+
+        requestContext = createRequestContext()
+        addWordToGroup(requestContext, groupId, word, textOrId)
+        clearRequestContext(requestContext)
+
+        self.redirect('/group?id=' + str(groupId))
+
+
 class CreateGroupHandler(webapp2.RequestHandler):
     def get(self):
 
@@ -305,4 +326,5 @@ app = webapp2.WSGIApplication([
     ('/searchWordInBook', SearchWordInBookHandler),
     ('/createGroup', CreateGroupHandler),
     ('/group', ShowGroupHandler),
+    ('/addWordToGroup', AddWordToGroupHandler),
 ], debug=True)
