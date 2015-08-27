@@ -29,9 +29,9 @@
 
 
 {% for temp in group.words %}
-    <li>
-        <a href="/word?id={{ temp[0] }}">{{ temp[1] }}</a>
-    </li>
+<li>
+    <a href="/word?id={{ temp[0] }}">{{ temp[1] }}</a> <a href="/removeWordFromGroup?groupId={{ group.groupId }}&wordId={{ temp[0] }}" style="font-size: 8px">remove</a>
+</li>
 {% endfor %}
 
 

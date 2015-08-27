@@ -76,4 +76,9 @@ def addWordToGroup(rc, groupId, word, textOrId=True):
     rc["db"].commit()
 
 
-
+def removeWordFromGroup(rc, groupId, wordId):
+    cursor = rc["db"].cursor()
+    query = 'DELETE FROM sadnadb.wordsInGroupWords ' \
+            'WHERE groupWordId = %s AND wordId = %s'
+    cursor.execute(query, (groupId, wordId))
+    rc["db"].commit()

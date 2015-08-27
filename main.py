@@ -300,6 +300,19 @@ class AddWordToGroupHandler(webapp2.RequestHandler):
         self.redirect('/group?id=' + str(groupId))
 
 
+class RemoveWordFromGroupHandler(webapp2.RequestHandler):
+    def get(self):
+
+        groupId = self.request.get('groupId')
+        wordId = self.request.get('wordId')
+
+        requestContext = createRequestContext()
+        removeWordFromGroup(requestContext, groupId, wordId)
+        clearRequestContext(requestContext)
+
+        self.redirect('/group?id=' + str(groupId))
+
+
 class CreateGroupHandler(webapp2.RequestHandler):
     def get(self):
 
@@ -328,4 +341,5 @@ app = webapp2.WSGIApplication([
     ('/createGroup', CreateGroupHandler),
     ('/group', ShowGroupHandler),
     ('/addWordToGroup', AddWordToGroupHandler),
+    ('/removeWordFromGroup', RemoveWordFromGroupHandler),
 ], debug=True)
