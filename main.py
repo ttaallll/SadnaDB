@@ -28,6 +28,7 @@ from book import *
 from words import *
 from group import *
 from phrase import *
+from statistics import *
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__) + '/templates'),
@@ -329,6 +330,21 @@ class ShowPhrasesHandler(webapp2.RequestHandler):
         self.response.write(template.render(template_values))
 
 
+class StatisticsHandler(webapp2.RequestHandler):
+    def get(self):
+
+        requestContext = createRequestContext()
+        statistics = getStatistics(requestContext)
+        clearRequestContext(requestContext)
+
+        template_values = {
+            'statistics': statistics
+        }
+
+        template = JINJA_ENVIRONMENT.get_template('statistics.html')
+        self.response.write(template.render(template_values))
+
+
 class AddWordToGroupHandler(webapp2.RequestHandler):
     def get(self):
 
@@ -415,4 +431,5 @@ app = webapp2.WSGIApplication([
     ('/phrases', ShowPhrasesHandler),
     ('/addWordToPhrase', AddWordToGroupHandler),
     ('/removeWordFromPhrase', RemoveWordFromGroupHandler),
+    ('/statistics', StatisticsHandler),
 ], debug=True)
