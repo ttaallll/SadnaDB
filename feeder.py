@@ -136,10 +136,6 @@ def addNewBook(rc, bookData):
     addAllWords(rc, bookLines, bookId, startBookChar, startBookLine)
 
 
-
-
-
-
 def getLanguageId(rc, languageName):
 
     languageNameLowerCase = languageName.lower()
@@ -156,7 +152,6 @@ def getLanguageId(rc, languageName):
 
         cursor.execute(selectLanguageIdQuery)
         result = cursor.fetchall()
-
 
     languageId = 0
     for r in result:

@@ -31,6 +31,22 @@
 </li>
 {% endfor %}
 
+<h3>Appearances</h3>
+{% for tempBookId in phrase.appearances %}
+    <li>
+        <a href="book?id={{ tempBookId }}">{{ phrase.appearances[tempBookId]['title'] }}</a>
+        <ul>
+        {% for tempLine in phrase.appearances[tempBookId]['lines']['data'] %}
+            <li>
+                line: {{ tempLine[0][2] }}, words: {{ tempLine[0][3] }} - {{ tempLine[0][3] + phrase.appearances[tempBookId]['lines']['count'] - 1 }}
+            {% for tempWord in tempLine %}
+                <a href="word?id={{ tempWord[0] }}&bookId={{ tempBookId }}">{{ tempWord[1] }}</a>
+            {% endfor %}
+            </li>
+        {% endfor %}
+        </ul>
+    </li>
+{% endfor %}
 
 </body>
 </html>

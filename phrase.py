@@ -57,6 +57,8 @@ def getPhrase(rc, phraseId):
 
     phrase['words'] = result
 
+    phrase['appearances'] = getBooksContainPhrases(rc, phraseId, len(phrase['words']))
+
     return phrase
 
 
@@ -67,4 +69,55 @@ def getAllPhrases(rc):
     result = cursor.fetchall()
 
     return result
+
+
+def getBooksContainPhrases(rc, phraseId, wordsInPhrase):
+
+    cursor = rc["db"].cursor()
+    query = 'select temp1.bookId, b.title, temp1.orderNumber, temp1.lineNumber, temp1.wordNumberInLine, count(temp1.lineNumber) cnt1 ' \
+            'from ' \
+            '(SELECT wb.bookId bookId, wb.originalWordLower ow, wp.orderNumber orderNumber, wb.lineNumber lineNumber, wb.wordNumberInLine wordNumberInLine ' \
+            'FROM sadnadb.wordsInPhrases wp, sadnadb.wordsInBooks wb ' \
+            'WHERE phraseId = %s AND wb.originalWordLower = wp.wordTextLower) as temp1,' \
+            '(SELECT wb.bookId bookId, wb.originalWordLower ow, wp.orderNumber orderNumber, wb.lineNumber lineNumber, wb.wordNumberInLine wordNumberInLine ' \
+            'FROM sadnadb.wordsInPhrases wp, sadnadb.wordsInBooks wb ' \
+            'WHERE phraseId = %s AND wb.originalWordLower = wp.wordTextLower) as temp2,' \
+            'sadnadb.books as b ' \
+            'where temp1.bookId = temp2.bookId ' \
+            'and temp1.lineNumber = temp2.lineNumber ' \
+            'and (temp1.wordNumberInLine = temp2.wordNumberInLine - 1 OR temp1.wordNumberInLine = temp2.wordNumberInLine + 1) ' \
+            'and temp1.bookId = b.id ' \
+            'group by temp1.lineNumber, temp1.bookId ' \
+            'order by cnt1 desc'
+    cursor.execute(query, (phraseId, phraseId))
+    result = cursor.fetchall()
+
+    books = {}
+    phrasesExists = []
+    for r in result:
+        if r[5] == (wordsInPhrase - 1) * 2:
+            phrasesExists += [r]
+
+            bookId = r[0]
+            words1 = []
+            for i in range(r[4], r[4] + wordsInPhrase):
+                query = 'SELECT w.id, wb.originalWord, wb.lineNumber, wb.wordNumberInLine ' \
+                        'FROM sadnadb.wordsInBooks wb, sadnadb.words w ' \
+                        'WHERE wb.lineNumber = %s AND wb.wordNumberInLine = %s AND w.id = wb.wordId AND wb.bookId = %s ' \
+                        'ORDER BY wb.wordNumberInLine'
+                cursor.execute(query, (r[3], i, bookId))
+                result2 = cursor.fetchall()
+
+                words1 += result2
+
+            if bookId not in books:
+                books[bookId] = {'lines': {'data': [], 'count': 0}, 'count': 0}
+
+            books[bookId]['lines']['data'] += [words1]
+            books[bookId]['lines']['count'] = len(words1)
+            books[bookId]['title'] = r[1]
+            books[bookId]['count'] += 1
+
+    return books
+
 

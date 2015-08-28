@@ -104,7 +104,7 @@ class UploadFileHandler(webapp2.RequestHandler):
 
         taskqueue.add(url='/addBookTask', params={'bookUrl': bookUrl})
 
-        self.response.write(bookUrl)
+        self.redirect('/')
 
 
 class ShowBookHandler(webapp2.RequestHandler):

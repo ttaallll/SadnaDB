@@ -112,16 +112,6 @@ def createQueryValuesWordsInBooks(rc, words, lineNumber, paragraphNumber, bookId
             currentChar += 1
             continue
 
-        # wordsToInsert += [{
-        #     'wordId': exists[newTempWord],
-        #     'bookId': bookId,
-        #     'lineNumber': lineNumber,
-        #     'wordNumber': currentWordCount,
-        #     'characterLocation': currentChar,
-        #     'sentenceNumber': 0,
-        #     'paragraphNumber': paragraphNumber
-        # }]
-
         wordsToInsert += [(
             exists[newTempWord],
             bookId,
@@ -131,8 +121,10 @@ def createQueryValuesWordsInBooks(rc, words, lineNumber, paragraphNumber, bookId
             0,
             paragraphNumber,
             currentWordInLine,
-            fixedWords[newTempWord]['original'],
-            fixedWords[newTempWord]['original'].lower()
+            # fixedWords[newTempWord]['original'],
+            # fixedWords[newTempWord]['original'].lower()
+            tempWord,
+            tempWord.lower()
         )]
 
         currentWordInLine += 1
@@ -314,7 +306,7 @@ def getLocationsOfWordInBook(rc, wordId, bookId, wordText):
     result = cursor.fetchall()
 
     wordLocations = []
-    bookFileLocation = result[0][13]
+    bookFileLocation = result[0][15]
     for r in result:
         wordLocations += [{
             'lineNumber': r[2],
