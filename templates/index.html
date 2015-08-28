@@ -73,6 +73,13 @@
     <input type="submit" value="add">
 </form>
 
+<h3>Last Phrases added</h3>
+{% for temp in lastPhrases %}
+<li>
+    <a href="/phrase?id={{ temp[0] }}">{{ temp[1] }}</a>
+</li>
+{% endfor %}
+
 <h3><a href="/phrases">Show all Phrases</a></h3>
 
 </body>

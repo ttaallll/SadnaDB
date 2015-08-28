@@ -241,11 +241,13 @@ class MainHandler(webapp2.RequestHandler):
         requestContext = createRequestContext()
         lastBooks = getLastNBookFromDB(requestContext, 5)
         lastGroups = getLastNGroupsFromDB(requestContext, 5)
+        lastPhrases = getLastNPhrasesFromDB(requestContext, 5)
         clearRequestContext(requestContext)
 
         template_values = {
             'lastBooks': lastBooks,
-            'lastGroups': lastGroups
+            'lastGroups': lastGroups,
+            'lastPhrases': lastPhrases
         }
 
         template = JINJA_ENVIRONMENT.get_template('index.html')

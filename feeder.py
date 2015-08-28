@@ -49,6 +49,16 @@ def getLastNGroupsFromDB(rc, n):
     return result
 
 
+def getLastNPhrasesFromDB(rc, n):
+
+    cursor = rc["db"].cursor()
+    query = 'SELECT * FROM sadnadb.phrases ORDER BY id DESC LIMIT %s'
+    cursor.execute(query, n)
+    result = cursor.fetchall()
+
+    return result
+
+
 def addBookToDB(rc, bookUrl, siteFormat):
 
     bookText = getFromStorage(bookUrl)
