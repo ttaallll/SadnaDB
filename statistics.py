@@ -24,7 +24,30 @@ def getStatistics(rc):
     cursor.execute(query)
     result = cursor.fetchall()
 
-    stats['avglength'] = result[0][0]
+    stats['avglengthWord'] = result[0][0]
+
+    ###
+    # average number of words in a line
+    query = 'select avg(temp1.c1) from ' \
+            '(SELECT COUNT(wb.lineNumber) c1, wb.lineNumber, wb.bookId ' \
+            'FROM sadnadb.wordsInBooks wb ' \
+            'GROUP BY wb.lineNumber, wb.bookId) temp1'
+    cursor.execute(query)
+    result = cursor.fetchall()
+
+    stats['avglengthLine'] = result[0][0]
+
+    ###
+    # average number of chars in a line
+    query = 'select avg(temp1.s1) from ' \
+            '(SELECT SUM(LENGTH(w.word)) s1, wb.lineNumber, wb.bookId ' \
+            'FROM sadnadb.wordsInBooks wb, sadnadb.words w ' \
+            'WHERE w.id = wb.wordId ' \
+            'GROUP BY wb.lineNumber, wb.bookId) temp1'
+    cursor.execute(query)
+    result = cursor.fetchall()
+
+    stats['avglengthChars'] = result[0][0]
 
     return stats
 

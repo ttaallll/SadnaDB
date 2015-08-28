@@ -13,12 +13,14 @@
 
 <h1>Statistics</h1>
 
-Average length of word: {{ statistics.avglength }}
+Average length of word: {{ statistics.avglengthWord }}<br/>
+Average length of words in a line: {{ statistics.avglengthLine }}<br/>
+Average length of characters in a line: {{ statistics.avglengthChars }}
 
 <h3>Common 1000 Words</h3>
 {% for tempWord in statistics.words %}
 <li>
-    <a href="/word?id={{ tempWord[0] }}">{{ tempWord[1] }}</a> - {{ tempWord[2] }}
+    <a href="/word?id={{ tempWord[0] }}">{{ tempWord[1].decode('utf-8') }}</a> - {{ tempWord[2] }}
 </li>
 {% endfor %}
 
