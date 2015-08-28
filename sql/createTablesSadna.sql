@@ -31,6 +31,8 @@ CREATE TABLE wordsInBooks (
 	sentenceNumber int,
 	paragraphNumber int,
 	wordNumberInLine int,
+	originalWord varchar(255),
+	originalWordLower varchar(255),
 	FOREIGN KEY (wordId) REFERENCES words(id),
 	FOREIGN KEY (bookId) REFERENCES books(id),
 	PRIMARY KEY (wordId, bookId, wordNumber)
@@ -53,7 +55,8 @@ CREATE TABLE wordsInGroupWords (
 
 CREATE TABLE phrases (
 	id int NOT NULL AUTO_INCREMENT,
-	dateCreated DATE,
+	name varchar(255),
+	dateCreated DATETIME DEFAULT CURRENT_TIMESTAMP,
 	PRIMARY KEY (id)
 );
 
@@ -61,7 +64,9 @@ CREATE TABLE wordsInPhrases (
 	wordId int,
 	phraseId int,
 	orderNumber int,
+	wordText varchar(255),
+	wordTextLower varchar(255),
 	FOREIGN KEY (wordId) REFERENCES words(id),
 	FOREIGN KEY (phraseId) REFERENCES phrases(id),
-	PRIMARY KEY (wordId, phraseId)
+	PRIMARY KEY (orderNumber, phraseId)
 );

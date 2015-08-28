@@ -27,6 +27,7 @@ from storage import *
 from book import *
 from words import *
 from group import *
+from phrase import *
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__) + '/templates'),
@@ -279,10 +280,25 @@ class ShowGroupHandler(webapp2.RequestHandler):
         self.response.write(template.render(template_values))
 
 
-class ShowGroupsHandler(webapp2.RequestHandler):
+class ShowPhraseHandler(webapp2.RequestHandler):
     def get(self):
 
-        groupId = self.request.get('id')
+        phraseId = self.request.get('id')
+
+        requestContext = createRequestContext()
+        phrase = getPhrase(requestContext, phraseId)
+        clearRequestContext(requestContext)
+
+        template_values = {
+            'phrase': phrase
+        }
+
+        template = JINJA_ENVIRONMENT.get_template('phrase.html')
+        self.response.write(template.render(template_values))
+
+
+class ShowGroupsHandler(webapp2.RequestHandler):
+    def get(self):
 
         requestContext = createRequestContext()
         groups = getAllGroups(requestContext)
@@ -293,6 +309,21 @@ class ShowGroupsHandler(webapp2.RequestHandler):
         }
 
         template = JINJA_ENVIRONMENT.get_template('groups.html')
+        self.response.write(template.render(template_values))
+
+
+class ShowPhrasesHandler(webapp2.RequestHandler):
+    def get(self):
+
+        requestContext = createRequestContext()
+        phrases = getAllPhrases(requestContext)
+        clearRequestContext(requestContext)
+
+        template_values = {
+            'phrases': phrases
+        }
+
+        template = JINJA_ENVIRONMENT.get_template('phrases.html')
         self.response.write(template.render(template_values))
 
 
@@ -346,6 +377,23 @@ class CreateGroupHandler(webapp2.RequestHandler):
 
         self.redirect('/group?id=' + str(groupId))
 
+
+class CreatePhraseHandler(webapp2.RequestHandler):
+    def get(self):
+
+        rc = createRequestContext()
+
+        if 'name' in self.request.GET and self.request.get('name') != '':
+            phraseId = createPhrase(rc, self.request.get('name'))
+        else:
+            self.response.write('no name for phrase given')
+            clearRequestContext(rc)
+            return
+
+        clearRequestContext(rc)
+
+        self.redirect('/phrase?id=' + str(phraseId))
+
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/upload', UploadFileHandler),
@@ -360,4 +408,9 @@ app = webapp2.WSGIApplication([
     ('/groups', ShowGroupsHandler),
     ('/addWordToGroup', AddWordToGroupHandler),
     ('/removeWordFromGroup', RemoveWordFromGroupHandler),
+    ('/createPhrase', CreatePhraseHandler),
+    ('/phrase', ShowPhraseHandler),
+    ('/phrases', ShowPhrasesHandler),
+    ('/addWordToPhrase', AddWordToGroupHandler),
+    ('/removeWordFromPhrase', RemoveWordFromGroupHandler),
 ], debug=True)

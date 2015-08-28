@@ -17,8 +17,6 @@ chars_to_remove = ['.', '!', '?', ',',
 
 def addAllWords(rc, bookLines, bookId, startBookChar, startBookLine):
 
-    print 'num of lines - ' + str(len(bookLines))
-
     currentChar = 0 + startBookChar
     currentLine = 1
     currentParagraph = 1
@@ -36,7 +34,7 @@ def addAllWords(rc, bookLines, bookId, startBookChar, startBookLine):
             currentWords = []
 
         if currentLine % LINES_OF_BULK_WORDS == 0:
-            print currentLine
+            print str(currentLine) + ' / ' + str(len(bookLines))
 
             currentWords = fixWords(currentWords)
             addWords(rc, currentWords)
@@ -63,7 +61,7 @@ def addAllWords(rc, bookLines, bookId, startBookChar, startBookLine):
             currentWordsThisLine = []
 
         if currentLine % LINES_OF_BULK_WORDS == 0:
-            print currentLine
+            print str(currentLine) + ' / ' + str(len(bookLines))
             insertWordsInBooks(rc, wordsInBooksToInsert)
             wordsInBooksToInsert = []
 
@@ -100,7 +98,8 @@ def createQueryValuesWordsInBooks(rc, words, lineNumber, paragraphNumber, bookId
 
     fixedWords = fixWords(words)
 
-    exists, notExists = checkIfWordsExists(rc, fixedWords)
+    justWords = [x for x in fixedWords]
+    exists, notExists = checkIfWordsExists(rc, justWords)
 
     for tempWord in words:
         # newTempWord = tempWord.replace("'", "\\'")
@@ -131,7 +130,9 @@ def createQueryValuesWordsInBooks(rc, words, lineNumber, paragraphNumber, bookId
             currentChar,
             0,
             paragraphNumber,
-            currentWordInLine
+            currentWordInLine,
+            fixedWords[newTempWord]['original'],
+            fixedWords[newTempWord]['original'].lower()
         )]
 
         currentWordInLine += 1
@@ -149,7 +150,7 @@ def fixWords(words):
     if len(words) == 0:
         return []
 
-    lowerWords = []
+    newWords = {}
     for tempWord in words:
         # newTempWord = tempWord.replace("'", "\\'")
         newTempWord = tempWord
@@ -159,22 +160,21 @@ def fixWords(words):
         if len(newTempWord) == 0:
             continue
 
-        lowerWords += [newTempWord.lower()]
+        newWords[newTempWord.lower()] = {'original': tempWord}
 
-    if '' in lowerWords:
-        lowerWords.remove('')
+    if '' in newWords:
+        newWords.pop('', None)
 
-    return lowerWords
+    return newWords
 
 
 def addWords(rc, words):
 
-    words = list(set(words))
-
     if len(words) == 0:
         return
 
-    wordsExists, wordsNotExists = checkIfWordsExists(rc, words)
+    justWords = [x for x in words]
+    wordsExists, wordsNotExists = checkIfWordsExists(rc, justWords)
 
     # insert to table words the not existed
     cursor = rc["db"].cursor()
@@ -221,8 +221,10 @@ def insertWordsInBooks(rc, wordsInBooks):
             ' characterLocation,' \
             ' sentenceNumber,' \
             ' paragraphNumber,' \
-            ' wordNumberInLine)' \
-            ' VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
+            ' wordNumberInLine,' \
+            ' originalWord,' \
+            ' originalWordLower)' \
+            ' VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
     cursor.executemany(query, wordsInBooks)
     rc["db"].commit()
 

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sadna DB - Tal Pais</title>
+    <style>
+        * {
+            font-family: "Trebuchet MS", Helvetica, sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+
+<h1>Phrases</h1>
+
+
+<form action="/createPhrase">
+    <input type="text" name="name" placeholder="Add new phrase">
+    <input type="submit" value="add">
+</form>
+
+
+<br/>
+{% for temp in phrases %}
+<li>
+    <a href="/phrase?id={{ temp[0] }}">{{ temp[1] }}</a>
+</li>
+{% endfor %}
+
+
+</body>
+</html>
