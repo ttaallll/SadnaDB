@@ -99,24 +99,21 @@ def getBooksContainPhrases(rc, phraseId, wordsInPhrase):
             phrasesExists += [r]
 
             bookId = r[0]
-            words1 = []
-            for i in range(r[4], r[4] + wordsInPhrase):
-                query = 'SELECT w.id, wb.originalWord, wb.lineNumber, wb.wordNumberInLine ' \
-                        'FROM sadnadb.wordsInBooks wb, sadnadb.words w ' \
-                        'WHERE wb.lineNumber = %s AND wb.wordNumberInLine = %s AND w.id = wb.wordId AND wb.bookId = %s ' \
-                        'ORDER BY wb.wordNumberInLine'
-                cursor.execute(query, (r[3], i, bookId))
-                result2 = cursor.fetchall()
+            query = 'SELECT w.id, wb.originalWord, wb.lineNumber, wb.wordNumberInLine ' \
+                    'FROM sadnadb.wordsInBooks wb, sadnadb.words w ' \
+                    'WHERE wb.lineNumber = %s AND w.id = wb.wordId AND wb.bookId = %s ' \
+                    'ORDER BY wb.wordNumberInLine'
+            cursor.execute(query, (r[3], bookId))
+            result2 = cursor.fetchall()
 
-                words1 += result2
+            words1 = result2
 
             if bookId not in books:
-                books[bookId] = {'lines': {'data': [], 'count': 0}, 'count': 0}
+                books[bookId] = {'lines': []}
 
-            books[bookId]['lines']['data'] += [words1]
-            books[bookId]['lines']['count'] = len(words1)
+            books[bookId]['lines'] += [{'data': words1, 'from': r[4], 'to': r[4] + wordsInPhrase}]
             books[bookId]['title'] = r[1]
-            books[bookId]['count'] += 1
+            # books[bookId]['count'] += 1
 
     return books
 
