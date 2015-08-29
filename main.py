@@ -29,6 +29,7 @@ from words import *
 from group import *
 from phrase import *
 from statistics import *
+from dataMining import *
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__) + '/templates'),
@@ -108,6 +109,16 @@ class UploadFileHandler(webapp2.RequestHandler):
         self.redirect('/')
 
 
+class RunDataMiningHandler(webapp2.RequestHandler):
+    def get(self):
+
+        bookId = self.request.get('bookId')
+
+        taskqueue.add(url='/datamineTask', params={'bookId': bookId})
+
+        self.redirect('/dataMining')
+
+
 class ShowBookHandler(webapp2.RequestHandler):
     def get(self):
         bookId = self.request.get('id')
@@ -124,6 +135,25 @@ class ShowBookHandler(webapp2.RequestHandler):
         }
 
         template = JINJA_ENVIRONMENT.get_template('book.html')
+        self.response.write(template.render(template_values))
+
+
+class ShowBooksHandler(webapp2.RequestHandler):
+    def get(self):
+        booksId = self.request.get('id')
+
+        requestContext = createRequestContext()
+
+        books = getBooksForTemplate(requestContext, booksId)
+
+        clearRequestContext(requestContext)
+
+        template_values = {
+            'books': books,
+            'booksId': booksId
+        }
+
+        template = JINJA_ENVIRONMENT.get_template('books.html')
         self.response.write(template.render(template_values))
 
 
@@ -345,6 +375,21 @@ class StatisticsHandler(webapp2.RequestHandler):
         self.response.write(template.render(template_values))
 
 
+class DataMiningHandler(webapp2.RequestHandler):
+    def get(self):
+
+        requestContext = createRequestContext()
+        dataMining = getDataMining(requestContext)
+        clearRequestContext(requestContext)
+
+        template_values = {
+            'dataMining': dataMining
+        }
+
+        template = JINJA_ENVIRONMENT.get_template('datamining.html')
+        self.response.write(template.render(template_values))
+
+
 class AddWordToGroupHandler(webapp2.RequestHandler):
     def get(self):
 
@@ -412,11 +457,25 @@ class CreatePhraseHandler(webapp2.RequestHandler):
 
         self.redirect('/phrase?id=' + str(phraseId))
 
+
+class DataMiningTaskHandler(webapp2.RequestHandler):
+    def post(self):
+
+        bookId = self.request.get('bookId')
+
+        rc = createRequestContext()
+
+        runDataMining(rc, bookId)
+
+        clearRequestContext(rc)
+
+
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/upload', UploadFileHandler),
     ('/addBookTask', AddBookTaskHandler),
     ('/book', ShowBookHandler),
+    ('/books', ShowBooksHandler),
     ('/word', ShowWordHandler),
     ('/search', SearchHandler),
     ('/notFound', NotFoundHandler),
@@ -432,4 +491,7 @@ app = webapp2.WSGIApplication([
     ('/addWordToPhrase', AddWordToGroupHandler),
     ('/removeWordFromPhrase', RemoveWordFromGroupHandler),
     ('/statistics', StatisticsHandler),
+    ('/dataMining', DataMiningHandler),
+    ('/rundatamine', RunDataMiningHandler),
+    ('/datamineTask', DataMiningTaskHandler),
 ], debug=True)

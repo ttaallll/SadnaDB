@@ -126,6 +126,33 @@ def getBookForTemplate(rc, bookId):
     return {'words': words, 'metaData': metaData}
 
 
+def getBooksForTemplate(rc, booksId):
+
+    ids = booksId.split(',')
+    books = {}
+
+    for temp in ids:
+        book = getBook(rc, temp)
+
+        words = []
+        for tempWordKey in book['words']:
+            newWord = {}
+            newWord['references'] = book['words'][tempWordKey]
+
+            newWord['text'] = book['words'][tempWordKey][0]['text'].decode('utf-8')
+            newWord['href'] = '/word?id=' + str(book['words'][tempWordKey][0]['id'])
+            newWord['count'] = len(newWord['references'])
+
+            words += [newWord]
+
+        metaData = book['metaData']
+        metaData['language'] = getLanguageNameById(rc, book['metaData']['language']).title()
+
+        books[temp] = {'words': words, 'metaData': metaData}
+
+    return books
+
+
 def getBooksByMetadata(rc, metaname, value):
     cursor = rc["db"].cursor()
 

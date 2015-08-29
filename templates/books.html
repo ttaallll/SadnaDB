@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sadna DB - Tal Pais</title>
+    <style>
+        * {
+            font-family: "Trebuchet MS", Helvetica, sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+{% for tempBook in books %}
+
+<h1>{{ books[tempBook].metaData['title'] }}</h1>
+<i><b>Author</b></i>: {{ books[tempBook].metaData['author'] }}
+<br/>
+<i><b>Release Date</b></i>: {{ books[tempBook].metaData['releaseDate'] }}
+<br/>
+<i><b>Language</b></i>: {{ books[tempBook].metaData['language'] }}
+<br/>
+<a href="https://storage.googleapis.com{{ books[tempBook].metaData['fileLocation'] }}">Full Text</a>
+<br/>
+<br/>
+
+<br/>
+<h3>Words</h3>
+{% for tempWord in books[tempBook].words %}
+    <li><a href="{{ tempWord.href }}&bookId={{ tempBook }}">{{ tempWord.text }}</a> - {{ tempWord.count }}
+        <i style="font-size: 10px">
+        {% for tempReference in tempWord.references %}
+        ({{ tempReference.wordNumber }}, {{ tempReference.lineNumber }}:{{ tempReference.wordNumberInLine }}),
+        {% endfor %}
+        </i>
+    </li>
+{% endfor %}
+
+{% endfor %}
+
+</body>
+</html>

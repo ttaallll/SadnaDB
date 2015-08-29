@@ -70,3 +70,15 @@ CREATE TABLE wordsInPhrases (
 	FOREIGN KEY (phraseId) REFERENCES phrases(id),
 	PRIMARY KEY (orderNumber, phraseId)
 );
+
+CREATE TABLE dataMining (
+  bookId int,
+  apperanceCount int,
+  wordId1 int,
+  wordId2 int,
+  dateCreated DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (wordId1) REFERENCES words(id),
+	FOREIGN KEY (wordId2) REFERENCES words(id),
+	FOREIGN KEY (bookId) REFERENCES books(id),
+	PRIMARY KEY (wordId1, wordId2, bookId)
+);

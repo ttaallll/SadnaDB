@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sadna DB - Tal Pais</title>
+    <style>
+        * {
+            font-family: "Trebuchet MS", Helvetica, sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Data Mining</h1>
+
+<form action="/rundatamine">
+    <input type="text" name="bookId" placeholder="enter book id">
+    <input type="submit" value="run">
+</form>
+
+
+
+<h3>Last tasks</h3>
+{% for temp in dataMining.commonWordsInSameLine.books %}
+<li>
+    <a href="/book?id={{ temp }}">{{ dataMining.commonWordsInSameLine.books[temp][0][1] }}</a>
+    <ul>
+        {% for temp2 in dataMining.commonWordsInSameLine.books[temp] %}
+        <li>
+            <a href="/word?id={{ temp2[2] }}&bookId={{ temp }}">{{ temp2[3] }}</a> <a href="/word?id={{ temp2[4] }}&bookId={{ temp }}">{{ temp2[5] }}</a> - {{ temp2[6] }}
+        </li>
+        {% endfor %}
+    </ul>
+</li>
+{% endfor %}
+
+</body>
+</html>
