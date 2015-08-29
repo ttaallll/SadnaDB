@@ -27,7 +27,7 @@
     <ul>
         {% for temp2 in dataMining.commonWordsInSameLine.books[temp] %}
         <li>
-            <a href="/word?id={{ temp2[2] }}&bookId={{ temp }}">{{ temp2[3] }}</a> <a href="/word?id={{ temp2[4] }}&bookId={{ temp }}">{{ temp2[5] }}</a> - {{ temp2[6] }}
+            <a href="/word?id={{ temp2[2] }}&bookId={{ temp }}">{{ temp2[3].decode('utf-8') }}</a> <a href="/word?id={{ temp2[4] }}&bookId={{ temp }}">{{ temp2[5].decode('utf-8') }}</a> - {{ temp2[6] }}
         </li>
         {% endfor %}
     </ul>
